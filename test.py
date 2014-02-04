@@ -1,22 +1,11 @@
 import numpy as np
+import pandas
+from splitter import find_best_splitter
+
+df = pandas.read_csv("/Users/SmartWombat/Dropbox/Metar/LEVT3H.csv", sep=r",\s+")
+
+print(type(df))
+print(df.shape)
 
 
-runs = [510, 511, 512, 513, 514, 517, 521]
-runs = [514]
-
-a = [1.0, 2.0, 3.0]
-b = [2.0, 2.0, 2.0]
-
-nda = np.asarray(a)
-ndb = np.sin(np.asarray(b))
-
-print(type(nda[0]))
-
-
-#print(ndc)
-
-ndc = nda * ndb
-
-
-print(ndc)
-
+print(find_best_splitter(df, 'temp', 'dewPoint'))
