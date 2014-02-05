@@ -3,13 +3,14 @@ __author__ = 'SmartWombat'
 import numpy as np
 
 
-def find_best_splitter(df, class_var, pred_var):
+def best_numeric_splitter(df, class_var, pred_var):
 
     # Drop NaNs and order under pred_var values
     df = df[np.isfinite(df[class_var])]
     df = df[np.isfinite(df[pred_var])]
     df = df.sort([pred_var])
     df.index = range(0,len(df))
+    #print(df.shape)
 
     total_cases = df.shape[0]
     y_sum = np.sum(df[class_var])
@@ -40,5 +41,7 @@ def find_best_splitter(df, class_var, pred_var):
             if new_split_value > best_till_now:
                 best_till_now = new_split_value
                 best_cut_point = (next_pred_value + row[pred_var])/2
+                left_df = df[:index]
+                right_df = df[index:]
 
-    return best_cut_point
+    return best_cut_point, best_till_now, left_df, right_df
