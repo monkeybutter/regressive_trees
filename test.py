@@ -11,7 +11,7 @@ print(df.shape)
 df = df[['windSpeed','pressure','temp','dewPoint']]
 print(df.shape)
 
-result = best_numeric_splitter(df, 'temp', 'dewPoint')
+result = linear_generic_splitter(df, 'temp', 'dewPoint')
 tree = tree_grower(df, 'temp')
 
 tree_runner(tree, "O")

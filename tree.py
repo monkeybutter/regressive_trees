@@ -37,7 +37,7 @@ def tree_grower(df, class_var):
     best_right_df = None
     for variable in df.columns:
         if variable != class_var:
-            value, score, left_df, right_df = best_numeric_splitter(df, class_var, variable)
+            value, score, left_df, right_df = linear_generic_splitter(df, class_var, variable)
         if score > best_score:
             best_var = variable
             best_value = value
@@ -47,7 +47,7 @@ def tree_grower(df, class_var):
     tree.split_var = best_var
     tree.split_value = best_value
     tree.score = best_score
-    if best_left_df.shape[0]>350:
+    if best_left_df.shape[0]>350:# and np.var(best_left_df[class_var])!=0.0 and np.var(best_left_df[variable])!=0.0:
         tree.left_child = tree_grower(best_left_df, class_var)
     else:
         left_leaf = leaf()
@@ -55,7 +55,7 @@ def tree_grower(df, class_var):
         left_leaf.members = best_left_df.shape[0]
         tree.left_child = left_leaf
 
-    if best_right_df.shape[0]>350:
+    if best_right_df.shape[0]>350:# and np.var(best_right_df[class_var])!=0.0 and np.var(best_right_df[variable])!=0.0:
         tree.right_child = tree_grower(best_right_df, class_var)
     else:
         right_leaf = leaf()
