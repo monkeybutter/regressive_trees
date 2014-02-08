@@ -18,11 +18,11 @@ class BasicRegressionCriteria(Criteria):
 
             Copyright (c) 2014 by MonkeyButter
     """
-    source = 'basic_regression'
+    source = 'linear'
     __class_description__ = """Basic criteria for measuring split quality in regression trees"""
     __version__ = 0.1
 
-    def __init__(self):
+    def __init__(self, class_var):
         r"""Class constructor.
 
         Initialise the class' attributes. PEP-8 mentions using a leading
@@ -38,7 +38,7 @@ class BasicRegressionCriteria(Criteria):
         super(BasicRegressionCriteria, self).__init__()
 
 
-    def get_value(self, left_df, right_df, class_var):
+    def get_value(self, left_df, right_df):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -52,8 +52,8 @@ class BasicRegressionCriteria(Criteria):
             If the function hasn't been implemented yet.
         """
         left_cases = left_df.shape[0]
-        left_y_sum = np.sum(left_df[class_var])
+        left_y_sum = np.sum(left_df[self.class_var])
         right_cases = right_df.shape[0]
-        right_y_sum = np.sum(right_df[class_var])
+        right_y_sum = np.sum(right_df[self.class_var])
 
         return (left_y_sum**2/left_cases) + (right_y_sum**2/right_cases)

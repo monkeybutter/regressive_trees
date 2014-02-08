@@ -18,12 +18,12 @@ class MSERegressionCriteria(Criteria):
 
             Copyright (c) 2014 by MonkeyButter
     """
-    source = 'mse_regression'
+    source = 'linear2'
     __class_description__ = """Mean squared error impurity criterion.
                                MSE = var_left + var_right"""
     __version__ = 0.1
 
-    def __init__(self):
+    def __init__(self, class_var):
         r"""Class constructor.
 
         Initialise the class' attributes. PEP-8 mentions using a leading
@@ -39,7 +39,7 @@ class MSERegressionCriteria(Criteria):
         super(MSERegressionCriteria, self).__init__()
 
 
-    def get_value(self, left_df, right_df, class_var):
+    def get_value(self, left_df, right_df):
         r"""
         Returns
         -------
@@ -47,4 +47,4 @@ class MSERegressionCriteria(Criteria):
             MSE
         """
 
-        return np.var(left_df[class_var]) + np.var(right_df[class_var])
+        return np.var(left_df[self.class_var]) + np.var(right_df[self.class_var])

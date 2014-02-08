@@ -1,9 +1,8 @@
 __author__ = 'SmartWombat'
 
-class Criteria(object):
+class Splitter(object):
 
     source = None
-    class_var = None
 
     __class_description__ = """Abstract class for feature extracting"""
     __version__ = 0.1
@@ -39,7 +38,7 @@ class Criteria(object):
 
         return help_string
 
-    def __init__(self, class_var):
+    def __init__(self):
         r"""Class constructor.
 
         Initialise the class' attributes. PEP-8 mentions using a leading
@@ -66,10 +65,8 @@ class Criteria(object):
         TODO: how best to document class attributes.
         """
 
-        self.class_var = class_var
 
-
-    def get_value(self, left_df, right_df):
+    def get_split_values(self, df, class_var, pred_var, bearing_a=None, bearing_b=None):
         r"""Returns a value with the average height of crop
 
         Returns
