@@ -10,7 +10,7 @@ class Criteria(object):
 
 
     @classmethod
-    def is_extractor_for(cls, source):
+    def is_criteria_for(cls, source):
         return source == cls.source
 
     @classmethod

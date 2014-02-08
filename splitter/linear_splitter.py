@@ -22,7 +22,7 @@ class LinearSplitter(Splitter):
     __class_description__ = """Basic criteria for measuring split quality in regression trees"""
     __version__ = 0.1
 
-    def __init__(self):
+    def __init__(self, criteria):
         r"""Class constructor.
 
         Initialise the class' attributes. PEP-8 mentions using a leading
@@ -35,10 +35,10 @@ class LinearSplitter(Splitter):
 
         #: Document this instance member.
 
-        super(LinearSplitter, self).__init__()
+        super(LinearSplitter, self).__init__(criteria)
 
 
-    def get_split_values(self, df, pred_var, criteria):
+    def get_split_values(self, df, pred_var):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -78,7 +78,7 @@ class LinearSplitter(Splitter):
                 next_pred_value = df[pred_var][index]
 
             if next_pred_value != df[pred_var][index]:
-                new_split_value = criteria.get_value(left_df, right_df)
+                new_split_value = self.criteria.get_value(left_df, right_df)
                 print(new_split_value)
                 if new_split_value > best_till_now:
                     best_till_now = new_split_value

@@ -23,7 +23,7 @@ class CircularSplitter(Splitter):
     __class_description__ = """Basic splitter for circular data"""
     __version__ = 0.1
 
-    def __init__(self):
+    def __init__(self, criteria):
         r"""Class constructor.
 
         Initialise the class' attributes. PEP-8 mentions using a leading
@@ -36,7 +36,7 @@ class CircularSplitter(Splitter):
 
         #: Document this instance member.
 
-        super(CircularSplitter, self).__init__()
+        super(CircularSplitter, self).__init__(criteria)
 
 
     def get_split_values(self, df, pred_var, criteria, bearing_a, bearing_b):

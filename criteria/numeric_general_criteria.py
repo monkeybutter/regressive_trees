@@ -35,7 +35,7 @@ class BasicRegressionCriteria(Criteria):
 
         #: Document this instance member.
 
-        super(BasicRegressionCriteria, self).__init__()
+        super(BasicRegressionCriteria, self).__init__(class_var)
 
 
     def get_value(self, left_df, right_df):

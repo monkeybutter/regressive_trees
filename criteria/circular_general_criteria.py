@@ -21,6 +21,8 @@ class CircularRegressionCriteria(Criteria):
             Copyright (c) 2014 by MonkeyButter
     """
     source = 'circular'
+    class_var = None
+
     __class_description__ = """Basic criteria for measuring split quality in regression trees with circular data"""
 
     __version__ = 0.1
@@ -38,10 +40,11 @@ class CircularRegressionCriteria(Criteria):
 
         #: Document this instance member.
 
-        super(CircularRegressionCriteria, self).__init__()
+        super(CircularRegressionCriteria, self).__init__(class_var)
 
 
     def get_value(self, left_df, right_df):
+        print(self.class_var)
         r"""Returns a value with the average height of crop
 
         Returns
@@ -56,6 +59,9 @@ class CircularRegressionCriteria(Criteria):
         """
         #criteria has to maximise optimal value
         heterogeneity = circular_heterogeneity(left_df[self.class_var]) + circular_heterogeneity(right_df[self.class_var])
+        print heterogeneity
+        print left_df
+        print right_df
         if heterogeneity == 0.0:
             return sys.float_info.max
         else:

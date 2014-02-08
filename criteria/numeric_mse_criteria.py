@@ -36,7 +36,7 @@ class MSERegressionCriteria(Criteria):
 
         #: Document this instance member.
 
-        super(MSERegressionCriteria, self).__init__()
+        super(MSERegressionCriteria, self).__init__(class_var)
 
 
     def get_value(self, left_df, right_df):
