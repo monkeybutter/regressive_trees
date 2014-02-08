@@ -2,6 +2,8 @@ __author__ = 'SmartWombat'
 
 import numpy as np
 from criteria import Criteria
+from util import circular_heterogeneity
+import sys
 
 class CircularRegressionCriteria(Criteria):
 
@@ -52,9 +54,8 @@ class CircularRegressionCriteria(Criteria):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
-        left_cases = left_df.shape[0]
-        left_y_sum = np.sum(left_df[class_var])
-        right_cases = right_df.shape[0]
-        right_y_sum = np.sum(right_df[class_var])
-
-        return (left_y_sum**2/left_cases) + (right_y_sum**2/right_cases)
+        heterogeneity = circular_heterogeneity(left_df[class_var]) + circular_heterogeneity(right_df[class_var])
+        if heterogeneity == 0.0:
+            return sys.float_info.max
+        else:
+            return 1/heterogeneity
