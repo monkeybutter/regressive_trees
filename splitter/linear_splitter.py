@@ -82,7 +82,8 @@ class LinearSplitter(Splitter):
 
                 if new_split_value > best_till_now:
                     best_till_now = new_split_value
-                    best_cut_point = (next_pred_value + df[pred_var][index])/2
+                    best_cut_point = (next_pred_value + df[pred_var][index])/2.0
                     best_index = index
 
-        return best_cut_point, best_till_now, df[:best_index], df[best_index:]
+        # sequence indexing is [start_pos:end_pos(excluded)]
+        return best_cut_point, best_till_now, df[:best_index+1], df[best_index+1:]
