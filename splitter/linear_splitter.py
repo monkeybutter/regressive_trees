@@ -79,7 +79,7 @@ class LinearSplitter(Splitter):
 
             if next_pred_value != df[pred_var][index]:
                 new_split_value = self.criteria.get_value(left_df, right_df)
-                print(new_split_value)
+
                 if new_split_value > best_till_now:
                     best_till_now = new_split_value
                     best_cut_point = (next_pred_value + df[pred_var][index])/2

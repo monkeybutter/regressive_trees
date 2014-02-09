@@ -52,6 +52,7 @@ def circular_heterogeneity(angles_series):
 
     for angle in angles_series.iteritems():
         distance_sum += 1 - math.cos(math.pi*angle[1]/180-math.pi*angular_mean/180)
+
     return distance_sum/angles_series.shape[0]
 
 

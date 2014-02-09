@@ -6,8 +6,6 @@ from criteria.criteria import Criteria
 def CriteriaFactory(source, class_var):
     for cls in Criteria.__subclasses__():
         if cls.is_criteria_for(source):
-            print(cls)
-            print(class_var)
             return cls(class_var)
 
     print("{} source not found".format(source))

@@ -85,4 +85,5 @@ class CircularSplitter(Splitter):
                         best_cut_point = (next_pred_value + df[pred_var][index])/2
                         best_index = index
 
+        # Test if returning parts of df and not new instances could affect the results
         return best_cut_point, best_till_now, df[:best_index], df[best_index:]

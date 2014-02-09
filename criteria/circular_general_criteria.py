@@ -44,7 +44,6 @@ class CircularRegressionCriteria(Criteria):
 
 
     def get_value(self, left_df, right_df):
-        print(self.class_var)
         r"""Returns a value with the average height of crop
 
         Returns
@@ -59,9 +58,7 @@ class CircularRegressionCriteria(Criteria):
         """
         #criteria has to maximise optimal value
         heterogeneity = circular_heterogeneity(left_df[self.class_var]) + circular_heterogeneity(right_df[self.class_var])
-        print heterogeneity
-        print left_df
-        print right_df
+
         if heterogeneity == 0.0:
             return sys.float_info.max
         else:
