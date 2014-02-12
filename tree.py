@@ -62,7 +62,7 @@ class Tree(object):
         node.split_value = best_value
         node.score = best_score
         node.members = df.shape[0]
-        if best_left_df.shape[0]>350 and np.var(best_left_df[self.class_var])!=0.0 and np.var(best_left_df[best_var])!=0.0:
+        if best_left_df.shape[0]>15 and np.var(best_left_df[self.class_var])!=0.0 and np.var(best_left_df[best_var])!=0.0:
             node.left_child = self.tree_grower(best_left_df)
         else:
             left_leaf = Leaf()
@@ -70,7 +70,7 @@ class Tree(object):
             left_leaf.members = best_left_df.shape[0]
             node.left_child = left_leaf
 
-        if best_right_df.shape[0]>350 and np.var(best_right_df[self.class_var])!=0.0 and np.var(best_right_df[best_var])!=0.0:
+        if best_right_df.shape[0]>15 and np.var(best_right_df[self.class_var])!=0.0 and np.var(best_right_df[best_var])!=0.0:
             node.right_child = self.tree_grower(best_right_df)
         else:
             right_leaf = Leaf()
