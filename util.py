@@ -27,13 +27,23 @@ def daily_distance(date_a, date_b):
     return min(dist, 24*60*60-dist)
 
 
-def bearing_average(angles_series):
+def mid_angle(ang_a, ang_b):
+    #input in Degrees [0-360]
+
+    if ang_b >= ang_a:
+        return ang_a + (ang_b - ang_a)/2.0
+
+    else:
+        return (ang_a + ((360-ang_a) + ang_b)/2.0) % 360
+
+
+def bearing_average(df, pred_var):
     #input in Degrees [0-360]
 
     x = y = 0.0
-    for angle in angles_series.iteritems():
-        x += math.cos(math.pi*angle[1]/180)
-        y += math.sin(math.pi*angle[1]/180)
+    for index, row in df.iterrows():
+        x += math.cos(math.pi*row[pred_var]/180)
+        y += math.sin(math.pi*row[pred_var]/180)
 
     avg = math.atan2(y, x)*180/math.pi
 
@@ -43,17 +53,20 @@ def bearing_average(angles_series):
         return avg
 
 
-def circular_heterogeneity(angles_series):
+def circular_heterogeneity(df, pred_var):
     #input in Degrees [0-360]
 
-    angular_mean = bearing_average(angles_series)
+    #print('inside heterogeneity {}'.format(angles_series))
+
+    angular_mean = bearing_average(df, pred_var)
+    #print('angular mean {}'.format(angular_mean))
 
     distance_sum = 0.0
 
-    for angle in angles_series.iteritems():
-        distance_sum += 1 - math.cos(math.pi*angle[1]/180-math.pi*angular_mean/180)
+    for index, row in df.iterrows():
+        distance_sum += 1 - math.cos(math.pi*row[pred_var]/180-math.pi*angular_mean/180)
 
-    return distance_sum/angles_series.shape[0]
+    return distance_sum/df.shape[0]
 
 
 def sort_in_arc(df, bearing_a, bearing_b, pred_var):

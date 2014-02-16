@@ -57,9 +57,13 @@ class CircularRegressionCriteria(Criteria):
             If the function hasn't been implemented yet.
         """
         #criteria has to maximise optimal value
-        heterogeneity = circular_heterogeneity(left_df[self.class_var]) + circular_heterogeneity(right_df[self.class_var])
+        #print('inside criteria left_df {}'.format(left_df))
+        #print('inside criteria left_df.class_var {}'.format(left_df[self.class_var]))
+
+        heterogeneity = circular_heterogeneity(left_df, self.class_var) + circular_heterogeneity(right_df, self.class_var)
+        #print('heterogeneity {}'.format(heterogeneity))
 
         if heterogeneity == 0.0:
             return sys.float_info.max
         else:
-            return 1/heterogeneity
+            return 1.0/heterogeneity

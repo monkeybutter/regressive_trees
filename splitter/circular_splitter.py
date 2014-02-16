@@ -62,10 +62,12 @@ class CircularSplitter(Splitter):
             #We need to check every split!
             df = df.sort([pred_var])
             df.index = range(0,len(df))
-            pass
+            total_cases = df.shape[0]
+            for index in range(1, total_cases):
+                pass
 
         else:
-            best_till_now = 0
+            best_split_value = 0
             best_cut_point = None
             best_index = None
             df = sort_in_arc(df, bearing_a, bearing_b, pred_var)
@@ -80,11 +82,11 @@ class CircularSplitter(Splitter):
 
                 if next_pred_value != df[pred_var][index]:
                     new_split_value = criteria.get_value(left_df, right_df)
-                    if new_split_value > best_till_now:
-                        best_till_now = new_split_value
+                    if new_split_value > best_split_value:
+                        best_split_value = new_split_value
                         best_cut_point = (next_pred_value + df[pred_var][index])/2.0
                         best_index = index
 
         # Test if returning parts of df and not new instances could affect the results
         # sequence indexing is [start_pos:end_pos(excluded)]
-        return best_cut_point, best_till_now, df[:best_index+1], df[best_index+1:]
+        return best_cut_point, best_split_value, df[:best_index+1], df[best_index+1:]
