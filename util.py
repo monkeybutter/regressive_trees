@@ -37,7 +37,18 @@ def mid_angle(ang_a, ang_b):
         return (ang_a + ((360-ang_a) + ang_b)/2.0) % 360
 
 
-def bearing_average(df, pred_var):
+def _bearing_average_in_arc(angular_df):
+    #input in Degrees [0-360]
+
+    avg = _bearing_average(angular_df.df, angular_df.var_name)
+
+    if _contained_in_arc(angular_df.start, angular_df.end, avg):
+        return avg
+    else:
+        return (avg+180) % 360
+
+
+def _bearing_average(df, pred_var):
     #input in Degrees [0-360]
 
     x = y = 0.0
@@ -49,24 +60,25 @@ def bearing_average(df, pred_var):
 
     if avg < 0.0:
         return 360+avg
+
     else:
         return avg
 
 
-def circular_heterogeneity(df, pred_var):
+def circular_heterogeneity(angular_df):
     #input in Degrees [0-360]
 
     #print('inside heterogeneity {}'.format(angles_series))
 
-    angular_mean = bearing_average(df, pred_var)
+    angular_mean = _bearing_average_in_arc(angular_df)
     #print('angular mean {}'.format(angular_mean))
 
     distance_sum = 0.0
 
-    for index, row in df.iterrows():
-        distance_sum += 1 - math.cos(math.pi*row[pred_var]/180-math.pi*angular_mean/180)
+    for index, row in angular_df.df.iterrows():
+        distance_sum += 1 - math.cos(math.pi*row[angular_df.var_name]/180-math.pi*angular_mean/180)
 
-    return distance_sum/df.shape[0]
+    return distance_sum/angular_df.df.shape[0]
 
 
 def sort_in_arc(df, bearing_a, bearing_b, pred_var):
@@ -87,3 +99,15 @@ def sort_in_arc(df, bearing_a, bearing_b, pred_var):
 
     else:
         raise Exception('This call should not happen!')
+
+def _contained_in_arc(bearing_a, bearing_b, value):
+    if bearing_a < bearing_b:
+        if value < bearing_b and value > bearing_a:
+            return True
+        else:
+            return False
+    else:
+        if (value <= 360 and value > bearing_a) or (value < bearing_b and value >= 0):
+            return True
+        else:
+            return False

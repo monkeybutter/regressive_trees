@@ -2,7 +2,7 @@ __author__ = 'SmartWombat'
 
 import numpy as np
 from criteria import Criteria
-from util import circular_heterogeneity
+from util import circular_heterogeneity,mid_angle
 import sys
 
 class CircularRegressionCriteria(Criteria):
@@ -43,7 +43,7 @@ class CircularRegressionCriteria(Criteria):
         super(CircularRegressionCriteria, self).__init__(class_var)
 
 
-    def get_value(self, left_df, right_df):
+    def get_value(self, left_ang_df, right_ang_df):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -60,7 +60,7 @@ class CircularRegressionCriteria(Criteria):
         #print('inside criteria left_df {}'.format(left_df))
         #print('inside criteria left_df.class_var {}'.format(left_df[self.class_var]))
 
-        heterogeneity = circular_heterogeneity(left_df, self.class_var) + circular_heterogeneity(right_df, self.class_var)
+        heterogeneity = circular_heterogeneity(left_ang_df) + circular_heterogeneity(right_ang_df)
         #print('heterogeneity {}'.format(heterogeneity))
 
         if heterogeneity == 0.0:

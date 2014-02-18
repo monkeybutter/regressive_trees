@@ -4,69 +4,63 @@ from splitter import *
 from tree import *
 import time
 from util import mid_angle
+from angular_df.angular_df import AngularDF
 
 
 
-def best_split(df, pred_var):
+def best_split(angular_df):
     criteria = CriteriaFactory('circular', pred_var)
     total_cases = df.shape[0]
+    print total_cases
     best_score = 0
-    best_index = 0
+    best_left = None
+    best_right = None
     prev_val = -1
     for index in range(1, total_cases):
         if prev_val != df[pred_var][index]:
-            score = criteria.get_value(df[:index], df[index:])
+            left = angular_df.get_left(index)
+            print index
+            print left
+            right = angular_df.get_right(index)
+            score = criteria.get_value(left, right)
             if score > best_score:
                 #print('We have a new winner: {}'.format(score))
                 best_score = score
-                best_index = index
-            prev_val = df[pred_var][index]
+                best_left = left
+                best_right = right
+            prev_val = angular_df.df[pred_var].iloc[index]
 
-    return best_score, df[:best_index], df[best_index:]
+    return best_score, best_left, best_right
 
-def first_run(df, pred_var):
-    df = df.sort([pred_var])
-    df.index = range(0,len(df))
-    total_cases = df.shape[0]
+def first_run(angular_df):
+    total_cases = angular_df.df.shape[0]
     best_score = 0
     best_left = None
     best_right = None
     for index in range(total_cases):
-        #df = pandas.concat([df[index:], df[:index]])
-        #df = df[index:].append(df[:index]).copy(deep=True)
-        #df.index = range(0,df.shape[0])
-        #df.index = range(0,df.shape[0])
-        #print('Best split called: {}'.format(df[index:].append(df[:index])))
-        score, left_df, right_df = best_split(df[index:].append(df[:index]), pred_var)
-        #print('score received: {}'.format(score))
+        shifted = angular_df.get_shifted(index)
+        shifted.start = mid_angle(shifted.df[shifted.var_name].iloc[0], shifted.df[shifted.var_name].iloc[shifted.df.shape[0]-1])
+        shifted.end = mid_angle(shifted.df[shifted.var_name].iloc[0], shifted.df[shifted.var_name].iloc[shifted.df.shape[0]-1])
+        score, left_ang_df, right_ang_df = best_split(shifted)
         if score > best_score:
             best_score = score
-            best_left = left_df
-            best_right = right_df
+            best_ang_left = left_ang_df
+            best_ang_right = right_ang_df
 
-            #print best_score
-            #print best_left.angle
-            #print best_right.angle
 
     print '_______________'
     print best_score
-    print best_right
-    print best_left
-    print mid_angle(best_left[pred_var].max(), best_right[pred_var].min())
-    print mid_angle(best_right[pred_var].max(), best_left[pred_var].min())
+    print best_ang_left
+    print best_ang_right
 
 df = pandas.read_csv("data.csv")
 pred_var = 'angle'
+df = df.sort([pred_var])
+df.index = range(0,len(df))
 
+angular_df = AngularDF(df, pred_var)
 
-#print circular_heterogeneity(df.angle[:12])
-#print circular_heterogeneity(df.angle[12:])
-
-uno = [100, 101, 101, 102, 102]
-dos = [0, 1, 2]
-
-
-first_run(df, pred_var)
+first_run(angular_df)
 
 #print(df)
 """
