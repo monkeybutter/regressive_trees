@@ -27,13 +27,6 @@ def best_split(angular_df):
                 best_right = right
             prev_val = angular_df.df[pred_var].iloc[index]
 
-    print "vvvvvvvvvvvvvv"
-    if best_left != None:
-        print best_left.df
-    if best_right != None:
-        print best_right.df
-    print "vvvvvvvvvvvvvv"
-
     return best_score, best_left, best_right
 
 def first_run(angular_df):
@@ -43,20 +36,17 @@ def first_run(angular_df):
     best_right = None
     for index in range(total_cases):
         shifted = angular_df.get_shifted(index)
-        shifted.start = mid_angle(shifted.df[shifted.var_name].min(), shifted.df[shifted.var_name].max())
-        shifted.end = mid_angle(shifted.df[shifted.var_name].min(), shifted.df[shifted.var_name].max())
+        print shifted.df
+        shifted.start = mid_angle(shifted.df[shifted.var_name].iloc[shifted.df.shape[0]-1], shifted.df[shifted.var_name].iloc[0])
+        shifted.end = mid_angle(shifted.df[shifted.var_name].iloc[shifted.df.shape[0]-1], shifted.df[shifted.var_name].iloc[0])
+        print shifted.start
+        print shifted.end
         score, left_ang_df, right_ang_df = best_split(shifted)
         if score > best_score:
             best_score = score
             best_ang_left = left_ang_df
             best_ang_right = right_ang_df
-            print '_______X_______'
-            print best_score
-            print shifted.df
-            print shifted.start
-            print shifted.end
-            #print best_ang_left.df
-            #print best_ang_right.df
+
 
 
     print '_______________'

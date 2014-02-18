@@ -56,12 +56,8 @@ class CircularRegressionCriteria(Criteria):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
-        #criteria has to maximise optimal value
-        #print('inside criteria left_df {}'.format(left_df))
-        #print('inside criteria left_df.class_var {}'.format(left_df[self.class_var]))
 
         heterogeneity = circular_heterogeneity(left_ang_df) + circular_heterogeneity(right_ang_df)
-        #print('heterogeneity {}'.format(heterogeneity))
 
         if heterogeneity == 0.0:
             return sys.float_info.max
