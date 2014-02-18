@@ -70,15 +70,19 @@ def circular_heterogeneity(angular_df):
 
     #print('inside heterogeneity {}'.format(angles_series))
 
-    angular_mean = _bearing_average_in_arc(angular_df)
-    #print('angular mean {}'.format(angular_mean))
+    if angular_df != None:
+        angular_mean = _bearing_average_in_arc(angular_df)
+        #print('angular mean {}'.format(angular_mean))
 
-    distance_sum = 0.0
+        distance_sum = 0.0
 
-    for index, row in angular_df.df.iterrows():
-        distance_sum += 1 - math.cos(math.pi*row[angular_df.var_name]/180-math.pi*angular_mean/180)
+        for index, row in angular_df.df.iterrows():
+            distance_sum += 1 - math.cos(math.pi*row[angular_df.var_name]/180-math.pi*angular_mean/180)
 
-    return distance_sum/angular_df.df.shape[0]
+        return distance_sum/angular_df.df.shape[0]
+
+    else:
+        return 0.0
 
 
 def sort_in_arc(df, bearing_a, bearing_b, pred_var):
