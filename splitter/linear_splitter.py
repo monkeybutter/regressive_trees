@@ -38,7 +38,7 @@ class LinearSplitter(Splitter):
         super(LinearSplitter, self).__init__(criteria)
 
 
-    def get_split_values(self, df, pred_var):
+    def get_split_values(self, data, pred_var):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -54,36 +54,26 @@ class LinearSplitter(Splitter):
 
         #TODO Filter before calling tree
         # Drop NaNs and sort under pred_var values
-        df = df[np.isfinite(df[pred_var])]
+        data.df = data.df[np.isfinite(data.df[pred_var])]
+        data.df = data.df.sort([pred_var])
+        data.df.index = range(0,len(data.df))
 
-
-
-        df = df.sort([pred_var])
-        df.index = range(0,len(df))
-
-        total_cases = df.shape[0]
+        total_cases = data.df.shape[0]
 
         best_till_now = 0
         best_cut_point = None
         best_index = None
 
-        for index in range(1, df.shape[0]):
+        for index in range(1, data.df.shape[0]):
 
-            left_df = df[:index]
-            right_df = df[index:]
+            left_data = data.get_left(index, pred_var)
+            right_data = data.get_right(index, pred_var)
 
-            if index < total_cases-1:
-                next_pred_value = df[pred_var][index+1]
-            else:
-                next_pred_value = df[pred_var][index]
+            new_split_value = self.criteria.get_value(left_data, right_data)
 
-            if next_pred_value != df[pred_var][index]:
-                new_split_value = self.criteria.get_value(left_df, right_df)
-
-                if new_split_value > best_till_now:
-                    best_till_now = new_split_value
-                    best_cut_point = (next_pred_value + df[pred_var][index])/2.0
-                    best_index = index
+            if new_split_value > best_till_now:
+                best_till_now = new_split_value
+                best_index = index
 
         # sequence indexing is [start_pos:end_pos(excluded)]
-        return best_cut_point, best_till_now, df[:best_index+1], df[best_index+1:]
+        return best_cut_point, best_till_now, data.get_left(best_index), data.get_right(best_index)

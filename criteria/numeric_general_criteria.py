@@ -38,7 +38,7 @@ class BasicRegressionCriteria(Criteria):
         super(BasicRegressionCriteria, self).__init__(class_var)
 
 
-    def get_value(self, left_df, right_df):
+    def get_value(self, left_data, right_data):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -51,9 +51,18 @@ class BasicRegressionCriteria(Criteria):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
-        left_cases = left_df.shape[0]
-        left_y_sum = np.sum(left_df[self.class_var])
-        right_cases = right_df.shape[0]
-        right_y_sum = np.sum(right_df[self.class_var])
+        if left_data.df != None:
+            left_cases = left_data.df.shape[0]
+            left_y_sum = np.sum(left_data.df[self.class_var])
+        else:
+            left_cases = 1
+            left_y_sum = 0.0
+
+        if right_data.df != None:
+            right_cases = right_data.df.shape[0]
+            right_y_sum = np.sum(right_data.df[self.class_var])
+        else:
+            right_cases = 1
+            right_y_sum = 0.0
 
         return (left_y_sum**2/left_cases) + (right_y_sum**2/right_cases)

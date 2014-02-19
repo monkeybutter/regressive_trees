@@ -29,17 +29,14 @@ class Leaf(object):
 
 class Tree(object):
 
-    def __init__(self, class_var=None, class_type=None):
+    #def __init__(self):
 
-        #self.df = df
-        self.class_type = class_type
-        self.class_var = class_var
 
-    def tree_grower(self, df):
+    def tree_grower(self, data):
 
-        criteria = CriteriaFactory(self.class_type, self.class_var)
+        criteria = CriteriaFactory(data.class_type, data.class_var)
 
-        df = df[np.isfinite(df[self.class_var])]
+        data.df = data.df[np.isfinite(data.df[data.class_var])]
 
         node = Node()
 
@@ -48,33 +45,33 @@ class Tree(object):
         best_score = 0.0
         best_left_df = None
         best_right_df = None
-        for variable in df.columns:
-            if variable != self.class_var:
-                splitter = SplitterFactory('linear', criteria)
-                value, score, left_df, right_df = splitter.get_split_values(df, variable)
-                if score > best_score:
-                    best_var = variable
-                    best_value = value
-                    best_score = score
-                    best_left_df = left_df
-                    best_right_df = right_df
+
+        for variable, dict in data.var_limits.iteritems():
+            splitter = SplitterFactory(dict['type'], criteria)
+            value, score, left_df, right_df = splitter.get_split_values(data, variable)
+            if score > best_score:
+                best_var = variable
+                best_value = value
+                best_score = score
+                best_left_df = left_df
+                best_right_df = right_df
         node.split_var = best_var
         node.split_value = best_value
         node.score = best_score
-        node.members = df.shape[0]
-        if best_left_df.shape[0]>10 and np.var(best_left_df[self.class_var])!=0.0 and np.var(best_left_df[best_var])!=0.0:
+        node.members = data.df.shape[0]
+        if best_left_df.shape[0]>10 and np.var(best_left_df[data.class_var])!=0.0 and np.var(best_left_df[best_var])!=0.0:
             node.left_child = self.tree_grower(best_left_df)
         else:
             left_leaf = Leaf()
-            left_leaf.value = np.mean(best_left_df[self.class_var])
+            left_leaf.value = np.mean(best_left_df[data.class_var])
             left_leaf.members = best_left_df.shape[0]
             node.left_child = left_leaf
 
-        if best_right_df.shape[0]>10 and np.var(best_right_df[self.class_var])!=0.0 and np.var(best_right_df[best_var])!=0.0:
+        if best_right_df.shape[0]>10 and np.var(best_right_df[data.class_var])!=0.0 and np.var(best_right_df[best_var])!=0.0:
             node.right_child = self.tree_grower(best_right_df)
         else:
             right_leaf = Leaf()
-            right_leaf.value = np.mean(best_right_df[self.class_var])
+            right_leaf.value = np.mean(best_right_df[data.class_var])
             right_leaf.members = best_right_df.shape[0]
             node.right_child = right_leaf
 

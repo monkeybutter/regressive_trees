@@ -1,6 +1,6 @@
 __author__ = 'SmartWombat'
 
-from angular_df.angular_df import AngularDF
+from data.data import AngularDF
 import pandas
 from splitter import *
 from tree import *
