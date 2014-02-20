@@ -51,18 +51,21 @@ class BasicRegressionCriteria(Criteria):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
-        if left_data.df != None:
-            left_cases = left_data.df.shape[0]
-            left_y_sum = np.sum(left_data.df[self.class_var])
-        else:
+
+        if left_data is None:
             left_cases = 1
             left_y_sum = 0.0
 
-        if right_data.df != None:
-            right_cases = right_data.df.shape[0]
-            right_y_sum = np.sum(right_data.df[self.class_var])
         else:
+            left_cases = left_data.df.shape[0]
+            left_y_sum = np.sum(left_data.df[self.class_var])
+
+        if right_data is None:
             right_cases = 1
             right_y_sum = 0.0
+
+        else:
+            right_cases = right_data.df.shape[0]
+            right_y_sum = np.sum(right_data.df[self.class_var])
 
         return (left_y_sum**2/left_cases) + (right_y_sum**2/right_cases)

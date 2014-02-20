@@ -1,6 +1,7 @@
 __author__ = 'SmartWombat'
 
 from util import mid_angle
+import copy
 
 class Data(object):
 
@@ -71,43 +72,88 @@ class Data(object):
         self.df.index = range(0,len(self.df))
 
 
-    def get_left(self, index, var_name):
+    def get_left(self, index, var_name, var_type):
 
-        if index <= 0:
-            return None
+        if var_type == 'circular':
 
-        elif index >= self.df.shape[0]-1:
-            left_data = Data(self.df, self.class_var, self.var_types)
-            left_data.var_limits = self.var_limits
-            left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
-            left_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+            if index <= 0:
+                return None
 
-            return left_data
+            elif index >= self.df.shape[0]-1:
+                left_data = Data(self.df, self.class_var, self.var_types)
+                left_data.var_limits = copy.deepcopy(self.var_limits)
+                left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                left_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+                return left_data
+
+            else:
+                left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
+                left_data.var_limits = copy.deepcopy(self.var_limits)
+                left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                left_data.var_limits[var_name]['end'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
+                return left_data
+
+        elif var_type == 'linear':
+            if index <= 0:
+                return None
+
+            elif index >= self.df.shape[0]-1:
+                left_data = Data(self.df, self.class_var, self.var_types)
+                left_data.var_limits = copy.deepcopy(self.var_limits)
+                left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                left_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+                return left_data
+
+            else:
+                left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
+                left_data.var_limits = copy.deepcopy(self.var_limits)
+                left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                left_data.var_limits[var_name]['end'] = (self.df[var_name].iloc[index-1] + self.df[var_name].iloc[index]) / 2.0
+                return left_data
 
         else:
-            left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
-            left_data.var_limits = self.var_limits
-            left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
-            left_data.var_limits[var_name]['end'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
-            return left_data
+            raise Exception
 
 
-    def get_right(self, index, var_name):
+    def get_right(self, index, var_name, var_type):
 
-        if index <= 0:
-            right_data = Data(self.df, self.class_var, self.var_types)
-            right_data.var_limits = self.var_limits
-            right_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
-            right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
-            return right_data
+        if var_type == 'circular':
+            if index <= 0:
+                right_data = Data(self.df, self.class_var, self.var_types)
+                right_data.var_limits = copy.deepcopy(self.var_limits)
+                right_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+                return right_data
 
-        elif index >= self.df.shape[0]-1:
-            return None
+            elif index >= self.df.shape[0]-1:
+                return None
+
+            else:
+                right_data = Data(self.df.iloc[index:], self.class_var, self.var_types)
+                right_data.var_limits = copy.deepcopy(self.var_limits)
+                right_data.var_limits[var_name]['start'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
+                right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+
+                return right_data
+
+        elif var_type == 'linear':
+            if index <= 0:
+                right_data = Data(self.df, self.class_var, self.var_types)
+                right_data.var_limits = copy.deepcopy(self.var_limits)
+                right_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+                return right_data
+
+            elif index >= self.df.shape[0]-1:
+                return None
+
+            else:
+                right_data = Data(self.df.iloc[index:], self.class_var, self.var_types)
+                right_data.var_limits = copy.deepcopy(self.var_limits)
+                right_data.var_limits[var_name]['start'] = (self.df[var_name].iloc[index-1] + self.df[var_name].iloc[index]) / 2.0
+                right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
+
+                return right_data
 
         else:
-            right_data = Data(self.df.iloc[index:], self.class_var, self.var_types)
-            right_data.var_limits = self.var_limits
-            right_data.var_limits[var_name]['start'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
-            right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
-
-            return right_data
+            raise Exception
