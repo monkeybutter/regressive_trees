@@ -58,23 +58,24 @@ class LinearSplitter(Splitter):
         data.df = data.df.sort([pred_var])
         data.df.index = range(0,len(data.df))
 
-        #print('Total values {}'.format(data.df.shape[0]))
-
-        best_till_now = 0
-        best_cut_point = None
+        best_score = 0
         best_index = None
 
-        for index in range(1, data.df.shape[0]):
+        prev_val = data.df[pred_var].iloc[1]
 
-            left_data = data.get_left(index, pred_var, 'linear')
-            right_data = data.get_right(index, pred_var, 'linear')
+        for index in range(1, data.df.shape[0]-1):
+            if prev_val != data.df[pred_var].iloc[index]:
 
-            new_split_value = self.criteria.get_value(left_data, right_data)
+                left_data = data.get_left(index, pred_var, 'linear')
+                right_data = data.get_right(index, pred_var, 'linear')
 
-            if new_split_value > best_till_now:
-                best_till_now = new_split_value
-                best_index = index
+                score = self.criteria.get_value(left_data, right_data)
 
+                if score > best_score:
+                    best_score = score
+                    best_index = index
+
+                prev_val = data.df[pred_var].iloc[index]
 
         # sequence indexing is [start_pos:end_pos(excluded)]
-        return best_cut_point, best_till_now, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')
+        return best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')

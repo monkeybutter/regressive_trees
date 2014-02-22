@@ -6,15 +6,18 @@ from util import mid_angle
 from data.data import Data
 
 
-df = pandas.read_csv("data.csv")
+df = pandas.read_csv("/Users/SmartWombat/Desktop/LEVT.csv")
+#df = pandas.read_csv("data.csv")
 
 
 #print df.head(10)
 
-#df = df[['angle', 'value']]
+df = df[['windSpeed', 'temp', 'dewPoint', 'pressure']]
+#df = df[['temp', 'pressure']]
 
-class_var = 'value'
-var_types = ['linear', 'linear']
+
+class_var = 'temp'
+var_types = ['linear', 'linear', 'linear', 'linear']
 df = df.sort([class_var])
 df.index = range(0,len(df))
 
@@ -22,9 +25,9 @@ df.index = range(0,len(df))
 data = Data(df, class_var, var_types)
 
 tree = Tree()
+
 node = tree.tree_grower(data)
 
 tree.tree_runner(node, "O")
-
 
 
