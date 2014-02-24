@@ -37,16 +37,19 @@ def mid_angle(ang_a, ang_b):
         return (ang_a + ((360-ang_a) + ang_b)/2.0) % 360
 
 
-def _bearing_average_in_arc(angular_df):
+def _bearing_average_in_arc(data, var_name):
     #input in Degrees [0-360]
 
-    avg = _bearing_average(angular_df.df, angular_df.var_name)
+    avg = _bearing_average(data.df, var_name)
 
-    if _contained_in_arc(angular_df.start, angular_df.end, avg):
+    return avg
+    """
+
+    if _contained_in_arc(data.var_limits[var_name].start, data.var_limits[var_name].end, avg):
         return avg
     else:
         return (avg+180) % 360
-
+    """
 
 def _bearing_average(df, pred_var):
     #input in Degrees [0-360]
@@ -65,21 +68,21 @@ def _bearing_average(df, pred_var):
         return avg
 
 
-def circular_heterogeneity(angular_df):
+def circular_heterogeneity(data):
     #input in Degrees [0-360]
 
     #print('inside heterogeneity {}'.format(angles_series))
 
-    if angular_df != None:
-        angular_mean = _bearing_average_in_arc(angular_df)
+    if data != None:
+        angular_mean = _bearing_average_in_arc(data, data.class_var)
         #print('angular mean {}'.format(angular_mean))
 
         distance_sum = 0.0
 
-        for index, row in angular_df.df.iterrows():
-            distance_sum += 1 - math.cos(math.pi*row[angular_df.var_name]/180-math.pi*angular_mean/180)
+        for index, row in data.df.iterrows():
+            distance_sum += 1 - math.cos(math.pi*row[data.class_var]/180-math.pi*angular_mean/180)
 
-        return distance_sum/angular_df.df.shape[0]
+        return distance_sum/data.df.shape[0]
 
     else:
         return 0.0

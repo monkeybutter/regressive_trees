@@ -2,7 +2,7 @@ __author__ = 'SmartWombat'
 
 import numpy as np
 from splitter import Splitter
-from util import *
+from util import mid_angle, sort_in_arc
 
 class CircularSplitter(Splitter):
 
@@ -48,94 +48,77 @@ class CircularSplitter(Splitter):
 
         """
 
-        #TODO Filter before calling tree
-
-
-        # This case comprises the first call to a
-        if data.var_limits['pred_var']['start'] == None or data.var_limits['pred_var']['end'] == None:
-            pass
-
-        if bearing_a == bearing_b:
-            #This is the first call to the circular splitter
-            #We need to check every split!
-            df = df.sort([pred_var])
-            df.index = range(0,len(df))
-            total_cases = df.shape[0]
-            for index in range(1, total_cases):
-                pass
+        if data.var_limits[pred_var]['start'] == None or data.var_limits[pred_var]['end'] == None:
+            return self._first_run(data, pred_var)
 
         else:
-            best_split_value = 0
-            best_cut_point = None
-            best_index = None
-            df = sort_in_arc(df, bearing_a, bearing_b, pred_var)
-            total_cases = df.shape[0]
-            for index in range(1, total_cases):
-                left_df = df[:index]
-                right_df = df[index:]
-                if index < total_cases-1:
-                    next_pred_value = df[pred_var][index+1]
-                else:
-                    next_pred_value = df[pred_var][index]
+            data.df = sort_in_arc(data.df, data.var_limits[pred_var]['start'], data.var_limits[pred_var]['end'], pred_var)
+            return self._get_split_values(data, pred_var)
 
-                if next_pred_value != df[pred_var][index]:
-                    new_split_value = criteria.get_value(left_df, right_df)
-                    if new_split_value > best_split_value:
-                        best_split_value = new_split_value
-                        best_cut_point = (next_pred_value + df[pred_var][index])/2.0
-                        best_index = index
 
-        # Test if returning parts of df and not new instances could affect the results
+    def _get_split_values(self, data, pred_var):
+
+        #TODO Filter before calling tree
+        # Drop NaNs and sort under pred_var values
+        #data.df = data.df[np.isfinite(data.df[pred_var])]
+        #data.df = data.df.sort([pred_var])
+        #data.df.index = range(0,len(data.df))
+
+        best_score = 0
+        best_index = None
+
+        prev_val = data.df[pred_var].iloc[1]
+
+        for index in range(1, data.df.shape[0]-1):
+            if prev_val != data.df[pred_var].iloc[index]:
+
+                left_data = data.get_left(index, pred_var, 'circular')
+                right_data = data.get_right(index, pred_var, 'circular')
+
+                score = self.criteria.get_value(left_data, right_data)
+
+                if score > best_score:
+                    best_score = score
+                    best_index = index
+
+                prev_val = data.df[pred_var].iloc[index]
+
         # sequence indexing is [start_pos:end_pos(excluded)]
-        return best_cut_point, best_split_value, df[:best_index+1], df[best_index+1:]
+        return best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')
 
 
-    def best_split(angular_df):
-        criteria = CriteriaFactory('circular', pred_var)
-        total_cases = df.shape[0]
+    def _first_run(self, data, pred_var):
         best_score = 0
         best_left = None
         best_right = None
-        prev_val = -1
-        for index in range(1, total_cases):
-            if prev_val != df[pred_var][index]:
-                right = angular_df.get_right(index)
-                left = angular_df.get_left(index)
-                score = criteria.get_value(left, right)
-                if score > best_score:
-                    #print('We have a new winner: {}'.format(score))
-                    best_score = score
-                    best_left = left
-                    best_right = right
-                prev_val = angular_df.df[pred_var].iloc[index]
+
+        data.df = data.df[np.isfinite(data.df[pred_var])]
+        data.df = data.df.sort([pred_var])
+        data.df.index = range(0,len(data.df))
+
+        shifter = self._shif_data(data, pred_var)
+
+        for shifted in shifter:
+
+            shifted.var_limits[pred_var]['start'] = mid_angle(shifted.df[pred_var].iloc[shifted.df.shape[0]-1], shifted.df[pred_var].iloc[0])
+            shifted.var_limits[pred_var]['end'] = mid_angle(shifted.df[pred_var].iloc[shifted.df.shape[0]-1], shifted.df[pred_var].iloc[0])
+            score, left_ang_df, right_ang_df = self._get_split_values(shifted, pred_var)
+            if score > best_score:
+                best_score = score
+                best_left = left_ang_df
+                best_right = right_ang_df
 
         return best_score, best_left, best_right
 
-    def first_run(angular_df):
-        total_cases = angular_df.df.shape[0]
-        best_score = 0
-        best_left = None
-        best_right = None
-        for index in range(total_cases):
-            shifted = angular_df.get_shifted(index)
-            print shifted.df
-            shifted.start = mid_angle(shifted.df[shifted.var_name].iloc[shifted.df.shape[0]-1], shifted.df[shifted.var_name].iloc[0])
-            shifted.end = mid_angle(shifted.df[shifted.var_name].iloc[shifted.df.shape[0]-1], shifted.df[shifted.var_name].iloc[0])
-            print shifted.start
-            print shifted.end
-            score, left_ang_df, right_ang_df = best_split(shifted)
-            if score > best_score:
-                best_score = score
-                best_ang_left = left_ang_df
-                best_ang_right = right_ang_df
 
+    def _shif_data(self, data, pred_var):
 
+        # TODO change -1 for None (more elegant)
+        shifted_data = data.get_copy()
+        prev_element = -1
 
-        print '_______________'
-        print best_score
-        print best_ang_left.df
-        print best_ang_left.start
-        print best_ang_left.end
-        print best_ang_right.df
-        print best_ang_right.start
-        print best_ang_right.end
+        for i in range(data.df.shape[0]):
+            if data.df[pred_var][i] != prev_element:
+                shifted_data.df = data.df[i:].append(data.df[:i])
+                yield shifted_data
+            prev_element = data.df[pred_var][i]

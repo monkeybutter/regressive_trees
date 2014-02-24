@@ -1,6 +1,6 @@
 __author__ = 'SmartWombat'
 
-from util import mid_angle
+from util import mid_angle, sort_in_arc
 import copy
 
 class Data(object):
@@ -44,7 +44,7 @@ class Data(object):
         self.df = df
         self.class_var = class_var
         self.var_types = var_types
-        self.set_class_type()
+        self._set_class_type()
 
         for idx, variable in enumerate(df.columns):
             if variable != class_var:
@@ -54,22 +54,24 @@ class Data(object):
                 self.var_limits[variable]['end'] = None
 
 
-    def set_class_type(self):
+    def _set_class_type(self):
         for idx, variable in enumerate(self.df.columns):
             if variable == self.class_var:
                 self.class_type = self.var_types[idx]
-
-
-    def get_shifted(self, index):
-
-        shifted_df = Data(self.df[index:].append(self.df[:index]), self.class_var, self.var_types)
-        return shifted_df
 
 
     def sort_by(self, pred_var):
 
         self.df = self.df.sort([pred_var])
         self.df.index = range(0,len(self.df))
+
+
+    def get_copy(self):
+
+        data_copy = Data(self.df, self.class_var, self.var_types)
+        data_copy.var_limits = copy.deepcopy(self.var_limits)
+
+        return data_copy
 
 
     def get_left(self, index, var_name, var_type):
@@ -90,6 +92,8 @@ class Data(object):
                 left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
                 left_data.var_limits = copy.deepcopy(self.var_limits)
                 left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
+                #print('Left start {}'.format(self.var_limits[var_name]['start']))
+                #print('Left end {}'.format(mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])))
                 left_data.var_limits[var_name]['end'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
                 return left_data
 
@@ -133,7 +137,6 @@ class Data(object):
                 right_data.var_limits = copy.deepcopy(self.var_limits)
                 right_data.var_limits[var_name]['start'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
-
                 return right_data
 
         elif var_type == 'linear':
