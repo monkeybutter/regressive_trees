@@ -21,7 +21,9 @@ df.index = range(0,len(df))
 data = Data(df, class_var, var_types)
 tree = Tree()
 node = tree.tree_grower(data)
-tree.tree_runner(node, "O")
+#tree.tree_runner(node, "O")
+
+print tree.tree_to_dict(node, "O")
 
 
 

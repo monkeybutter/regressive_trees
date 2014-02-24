@@ -1,7 +1,7 @@
 __author__ = 'SmartWombat'
 
 import numpy as np
-from splitter import *
+import json
 from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
 
@@ -58,7 +58,7 @@ class Tree(object):
         node.split_value = best_left.var_limits[best_var]['start'], best_left.var_limits[best_var]['end'], best_right.var_limits[best_var]['start'], best_right.var_limits[best_var]['end']
         node.score = best_score
         node.members = data.df.shape[0]
-        if best_left.df.shape[0]>100 and np.var(best_left.df[data.class_var])!=0.0 and np.var(best_left.df[best_var])!=0.0:
+        if best_left.df.shape[0]>50 and np.var(best_left.df[data.class_var])!=0.0 and np.var(best_left.df[best_var])!=0.0:
             node.left_child = self.tree_grower(best_left)
         else:
             left_leaf = Leaf()
@@ -66,7 +66,7 @@ class Tree(object):
             left_leaf.members = best_left.df.shape[0]
             node.left_child = left_leaf
 
-        if best_right.df.shape[0]>100 and np.var(best_right.df[data.class_var])!=0.0 and np.var(best_right.df[best_var])!=0.0:
+        if best_right.df.shape[0]>50 and np.var(best_right.df[data.class_var])!=0.0 and np.var(best_right.df[best_var])!=0.0:
             node.right_child = self.tree_grower(best_right)
         else:
             right_leaf = Leaf()
@@ -100,3 +100,32 @@ class Tree(object):
                 print('Leaf location: {}'.format(track+'Rx'))
                 print('Leaf members: {}'.format(tree.right_child.members))
                 print('Value {}'.format(tree.right_child.value))
+
+
+    def tree_to_dict(self, tree, track):
+        tree_dict = {}
+        tree_dict['name'] = track
+        tree_dict['children'] = []
+
+        if tree.left_child != None:
+            if tree.left_child.get_name() == 'Node':
+                tree_dict['children'].append(self.tree_to_dict(tree.left_child, track+'L'))
+            elif tree.left_child.get_name() == 'Leaf':
+                leaf = {}
+                leaf['name'] = track+'Lx'
+                leaf['members'] = tree.left_child.members
+                leaf['value'] = tree.left_child.value
+                tree_dict['children'].append(leaf)
+
+
+        if tree.right_child != None:
+            if tree.right_child.get_name() == 'Node':
+                tree_dict['children'].append(self.tree_to_dict(tree.right_child, track+'R'))
+            elif tree.right_child.get_name() == 'Leaf':
+                leaf = {}
+                leaf['name'] = track+'Rx'
+                leaf['members'] = tree.right_child.members
+                leaf['value'] = tree.right_child.value
+                tree_dict['children'].append(leaf)
+
+        return json.dumps(tree_dict).replace("\\", "")
