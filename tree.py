@@ -128,4 +128,4 @@ class Tree(object):
                 leaf['value'] = tree.right_child.value
                 tree_dict['children'].append(leaf)
 
-        return json.dumps(tree_dict).replace("\\", "")
+        return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")
