@@ -44,7 +44,7 @@ app.controller('ContactController', function ($scope, $http) {
 
     $scope.title = "DemoCtrl";
 
-    $scope. = {
+    $scope.d3Data = {
         "name": "O",
         "children": [
             {
