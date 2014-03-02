@@ -5,7 +5,7 @@
     2014 by CSIRO.
 """
 
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, send_file, make_response, request
 import glob
 import pandas
 import sys
@@ -17,7 +17,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return render_template('index.html')
+    return make_response(open('templates/index.html').read())
+    #return send_file('index.html')
 
 @app.route("/datasets")
 def datasets():
@@ -30,27 +31,47 @@ def datasets():
 def dataset(name):
 
     df = pandas.read_csv("static/data/" + name + ".csv")
+    desc = []
+    variables = df.columns.values.tolist()
+    first = True
 
-    desc = {}
-
-    desc["columns"] = df.columns.values.tolist()
-
-    desc["head"] = df.head(10).to_json()
-
-    print type(df.head(10))
+    for var in variables:
+        elem = {}
+        elem["var_name"] = var
+        elem["circular"] = False
+        if first:
+            elem["class_var"] = True
+            first = False
+        else:
+            elem["class_var"] = False
+        desc.append(elem)
 
     return Response(json.dumps(desc),  mimetype='application/json')
 
 
 @app.route("/datasets/<name>", methods= ['POST'])
 def tree(name):
+    data =  json.loads(request.data)
+    print request.data
+    print data
+    var_list = []
+    var_types = []
+    class_var = None
+    for var in data:
+        print var
+        print var["var_name"]
+        var_list.append(var["var_name"])
+        if var["circular"]:
+            var_types.append('circular')
+        else:
+            var_types.append('linear')
+        if var["class_var"]:
+            class_var = var["var_name"]
 
-    df = pandas.read_csv("static/data/weather.csv")
+    df = pandas.read_csv("static/data/" + name + ".csv")
 
-    df = df[['windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
+    df = df[var_list]
 
-    class_var = 'windSpeed'
-    var_types = ['circular', 'linear', 'linear', 'linear', 'linear']
     df = df.sort([class_var])
     df.index = range(0,len(df))
 
