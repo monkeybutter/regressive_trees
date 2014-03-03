@@ -105,27 +105,30 @@ class Tree(object):
     def tree_to_dict(self, tree, track):
         tree_dict = {}
         tree_dict['name'] = track
+        tree_dict['var_name'] = tree.split_var
         tree_dict['children'] = []
 
         if tree.left_child != None:
             if tree.left_child.get_name() == 'Node':
+                tree_dict['var_name'] = tree.left_child.split_var
                 tree_dict['children'].append(self.tree_to_dict(tree.left_child, track+'L'))
             elif tree.left_child.get_name() == 'Leaf':
                 leaf = {}
                 leaf['name'] = track+'Lx'
                 leaf['members'] = tree.left_child.members
-                leaf['value'] = tree.left_child.value
+                leaf['value'] = '{0:.2f}'.format(tree.left_child.value)
                 tree_dict['children'].append(leaf)
 
 
         if tree.right_child != None:
             if tree.right_child.get_name() == 'Node':
+                tree_dict['var_name'] = tree.right_child.split_var
                 tree_dict['children'].append(self.tree_to_dict(tree.right_child, track+'R'))
             elif tree.right_child.get_name() == 'Leaf':
                 leaf = {}
                 leaf['name'] = track+'Rx'
                 leaf['members'] = tree.right_child.members
-                leaf['value'] = tree.right_child.value
+                leaf['value'] = '{0:.2f}'.format(tree.right_child.value)
                 tree_dict['children'].append(leaf)
 
         return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")

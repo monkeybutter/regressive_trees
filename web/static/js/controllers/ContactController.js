@@ -44,6 +44,23 @@ app.controller('ContactController', function ($scope, $http) {
 
     $scope.title = "DemoCtrl";
 
+    /*
+    $scope.d3Data = [
+        {name: "Greg", score:98},
+        {name: "Ari", score:96},
+        {name: "Loser", score: 48}
+    ];
+
+    $scope.d3Data = [
+        {"name": "A", "value":-15},
+        {"name": "B", "value":-20},
+        {"name": "C", "value":-5},
+        {"name": "D", "value":5},
+        {"name": "E", "value":15},
+        {"name": "F", "value":25}
+    ];*/
+
+
     $scope.d3Data = {
         "name": "O",
         "children": [
@@ -53,129 +70,9 @@ app.controller('ContactController', function ($scope, $http) {
                 "members": 198
             },
             {
-                "name": "OR",
-                "children": [
-                    {
-                        "name": "ORL",
-                        "children": [
-                            {
-                                "name": "ORLL",
-                                "children": [
-                                    {
-                                        "value": 5.75,
-                                        "name": "ORLLLx",
-                                        "members": 28
-                                    },
-                                    {
-                                        "value": 2.945945945945946,
-                                        "name": "ORLLRx",
-                                        "members": 37
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "ORLR",
-                                "children": [
-                                    {
-                                        "name": "ORLRL",
-                                        "children": [
-                                            {
-                                                "value": 9.708333333333334,
-                                                "name": "ORLRLLx",
-                                                "members": 24
-                                            },
-                                            {
-                                                "name": "ORLRLR",
-                                                "children": [
-                                                    {
-                                                        "name": "ORLRLRL",
-                                                        "children": [
-                                                            {
-                                                                "value": 3.933333333333333,
-                                                                "name": "ORLRLRLLx",
-                                                                "members": 15
-                                                            },
-                                                            {
-                                                                "name": "ORLRLRLR",
-                                                                "children": [
-                                                                    {
-                                                                        "value": 8.380952380952381,
-                                                                        "name": "ORLRLRLRLx",
-                                                                        "members": 21
-                                                                    },
-                                                                    {
-                                                                        "value": 6.057142857142857,
-                                                                        "name": "ORLRLRLRRx",
-                                                                        "members": 35
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "value": 10.5,
-                                                        "name": "ORLRLRRx",
-                                                        "members": 12
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "name": "ORLRR",
-                                        "children": [
-                                            {
-                                                "value": 3.967741935483871,
-                                                "name": "ORLRRLx",
-                                                "members": 31
-                                            },
-                                            {
-                                                "name": "ORLRRR",
-                                                "children": [
-                                                    {
-                                                        "value": 7.589743589743589,
-                                                        "name": "ORLRRRLx",
-                                                        "members": 39
-                                                    },
-                                                    {
-                                                        "value": 4.7272727272727275,
-                                                        "name": "ORLRRRRx",
-                                                        "members": 22
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "name": "ORR",
-                        "children": [
-                            {
-                                "value": 13.518518518518519,
-                                "name": "ORRLx",
-                                "members": 27
-                            },
-                            {
-                                "name": "ORRR",
-                                "children": [
-                                    {
-                                        "value": 8.709677419354838,
-                                        "name": "ORRRLx",
-                                        "members": 31
-                                    },
-                                    {
-                                        "value": 6.285714285714286,
-                                        "name": "ORRRRx",
-                                        "members": 28
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "value": 2.945945945945946,
+                "name": "ORLLRx",
+                "members": 37
             }
         ]
     };
