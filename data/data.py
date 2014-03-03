@@ -5,12 +5,6 @@ import copy
 
 class Data(object):
 
-    df = None
-    class_var = None
-    class_type = None
-    var_types = None
-    var_limits = {}
-
     __class_description__ = """Abstract class for an tree dataframe"""
     __version__ = 0.1
 
@@ -41,13 +35,18 @@ class Data(object):
         TODO: how best to document class attributes.
         """
 
+
         self.df = df
         self.class_var = class_var
         self.var_types = var_types
+        self.var_limits = {}
+        self.class_type = None
         self._set_class_type()
 
         for idx, variable in enumerate(df.columns):
+            #print "class var: " + class_var
             if variable != class_var:
+                #print "limits for variable: " + variable
                 self.var_limits[variable] = {}
                 self.var_limits[variable]['type'] = var_types[idx]
                 self.var_limits[variable]['start'] = None

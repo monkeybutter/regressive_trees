@@ -42,7 +42,6 @@
 
                     // watch for data changes and re-render
                     scope.$watch('data', function (newVals, oldVals) {
-                        console.log(newVals)
                         return scope.render(newVals);
                     }, false);
 

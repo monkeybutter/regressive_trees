@@ -12,7 +12,7 @@ df = df[['windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
 #df = df[['windDir', 'currentDir']]
 
 
-class_var = 'windSpeed'
+class_var = 'temp'
 var_types = ['circular', 'linear', 'linear', 'linear', 'linear']
 df = df.sort([class_var])
 df.index = range(0,len(df))
