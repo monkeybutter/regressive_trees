@@ -55,9 +55,21 @@
 
                         var link = svg.selectAll(".link")
                             .data(links)
-                            .enter().append("path")
+                            .enter().append("g")
+                            .attr("class", "link");
+
+                        link.append("path")
                             .attr("class", "link")
                             .attr("d", diagonal);
+
+                        link.append("text")
+                            .attr("x", function(d) { return (d.source.y + d.target.y) / 2; })
+                            .attr("y", function(d) { return (d.source.x + d.target.x) / 2; })
+                            .attr("text-anchor", "middle")
+                            .attr("class", "linktext")
+                            .text(function(d) {
+                                return "edgeLabel";
+                            });
 
                         var node = svg.selectAll(".node")
                             .data(nodes)

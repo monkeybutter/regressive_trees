@@ -11,12 +11,11 @@ app.controller('ContactController', function ($scope, $http) {
     });
 
     $scope.selectDataset = function () {
-        console.log("hola")
         $http.get("datasets/" + $scope.dataset).success(function (data) {
             console.log(data)
             $scope.variables = data.descriptor;
             $scope.rows = data.rows;
-            $scope.head = JSON.stringify(data.head);
+            $scope.head = data.head;
             console.log(data.descriptor)
             $scope.var_name = $scope.variables[0].var_name;
 
