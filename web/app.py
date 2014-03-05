@@ -57,7 +57,9 @@ def dataset(name):
 
 @app.route("/datasets/<name>", methods= ['POST'])
 def tree(name):
-    data =  json.loads(request.data)
+    recv = json.loads(request.data)
+    data = recv["variables"]
+    min_leaf = recv["min_leaf"]
     var_list = []
     var_types = []
     class_var = None
@@ -77,11 +79,14 @@ def tree(name):
     df = df.sort([class_var])
     df.index = range(0,len(df))
 
+
     data = Data(df, class_var, var_types)
 
     tree = Tree()
 
-    node = tree.tree_grower(data)
+    print min_leaf
+    node = tree.tree_grower(data,min_leaf)
+    #print tree.tree_to_dict(node, "O")
 
     return Response(tree.tree_to_dict(node, "O"),  mimetype='application/json')
 

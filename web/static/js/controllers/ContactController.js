@@ -2,7 +2,7 @@ var app = angular.module('tree.controllers', [])
 
 app.controller('ContactController', function ($scope, $http) {
 
-    $scope.bin_value = 50
+    $scope.bin_value = 51
 
     $http.get("datasets").success(function (data) {
         $scope.datasets = data;
@@ -12,7 +12,6 @@ app.controller('ContactController', function ($scope, $http) {
 
     $scope.selectDataset = function () {
         $http.get("datasets/" + $scope.dataset).success(function (data) {
-            console.log(data)
             $scope.variables = data.descriptor;
             $scope.rows = data.rows;
             $scope.head = data.head;
@@ -34,10 +33,14 @@ app.controller('ContactController', function ($scope, $http) {
     };
 
     $scope.getTree = function () {
+        data_out = {}
+        console.log(typeof $scope.bin_value)
+        data_out["min_leaf"] = $scope.bin_value
+        data_out["variables"] = $scope.variables
         $http({
             url: 'http://127.0.0.1:5000/datasets/' + $scope.dataset,
             method: "POST",
-            data: $scope.variables,
+            data: data_out,
             headers: {'Content-Type': 'text/javascript'}
         }).success(function (data, status, headers, config) {
             $scope.d3Data = data

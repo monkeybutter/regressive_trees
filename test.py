@@ -12,14 +12,15 @@ df = df[['windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
 #df = df[['windDir', 'currentDir']]
 
 
-class_var = 'temp'
+class_var = 'windSpeed'
 var_types = ['circular', 'linear', 'linear', 'linear', 'linear']
 df = df.sort([class_var])
 df.index = range(0,len(df))
 
 data = Data(df, class_var, var_types)
 tree = Tree()
-node = tree.tree_grower(data)
+node = tree.tree_grower(data,100)
+
 #tree.tree_runner(node, "O")
 
 print tree.tree_to_dict(node, "O")

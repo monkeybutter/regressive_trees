@@ -10,7 +10,7 @@
                 },
                 link: function (scope, iElement, iAttrs) {
 
-                    var width = 800,
+                    var width = 900,
                         height = 600;
 
                     var cluster = d3.layout.cluster()
@@ -25,7 +25,7 @@
                         .attr("width", width)
                         .attr("height", height)
                         .append("g")
-                        .attr("transform", "translate(40,0)");
+                        .attr("transform", "translate(50,0)");
 
                     //.attr("width", "100%");
 
@@ -55,8 +55,8 @@
 
                         var link = svg.selectAll(".link")
                             .data(links)
-                            .enter().append("g")
-                            .attr("class", "link");
+                            .enter().append("g");
+                            //.attr("class", "link");
 
                         link.append("path")
                             .attr("class", "link")
@@ -68,7 +68,23 @@
                             .attr("text-anchor", "middle")
                             .attr("class", "linktext")
                             .text(function(d) {
-                                return "edgeLabel";
+
+                                if (d.target.name.slice(-1) == 'L') {
+                                    if (d.source.var_type == 'linear') {
+                                        return '< ' + d.source.var_limits[1];
+                                    }
+                                    else if (d.source.var_type == 'circular') {
+                                        return '[' + d.source.var_limits[0] + ', ' + d.source.var_limits[1] + ')';
+                                    }
+                                }
+                                else if (d.target.name.slice(-1) == 'R') {
+                                    if (d.source.var_type == 'linear') {
+                                        return '> ' + d.source.var_limits[2];
+                                    }
+                                    else if (d.source.var_type == 'circular') {
+                                        return '[' + d.source.var_limits[2] + ', ' + d.source.var_limits[3] + ')';
+                                    }
+                                }
                             });
 
                         var node = svg.selectAll(".node")
