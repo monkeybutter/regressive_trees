@@ -57,7 +57,10 @@ class CircularRegressionCriteria(Criteria):
             If the function hasn't been implemented yet.
         """
 
-        heterogeneity = circular_heterogeneity(left_data) + circular_heterogeneity(right_data)
+        left_cases = float(left_data.df.shape[0])
+        right_cases = float(right_data.df.shape[0])
+        total_cases = left_cases + right_cases
+        heterogeneity = (left_cases/total_cases * circular_heterogeneity(left_data)) + (right_cases/total_cases * circular_heterogeneity(right_data))
 
         if heterogeneity == 0.0:
             return sys.float_info.max
