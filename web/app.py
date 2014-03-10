@@ -84,11 +84,10 @@ def tree(name):
 
     tree = Tree()
 
-    print min_leaf
     node = tree.tree_grower(data,min_leaf)
     #print tree.tree_to_dict(node, "O")
 
     return Response(tree.tree_to_dict(node, "O"),  mimetype='application/json')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='188.226.143.52',port=80)

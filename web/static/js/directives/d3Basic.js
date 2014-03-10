@@ -25,7 +25,7 @@
                         .attr("width", width)
                         .attr("height", height)
                         .append("g")
-                        .attr("transform", "translate(50,0)");
+                        .attr("transform", "translate(60,0)");
 
                     //.attr("width", "100%");
 
