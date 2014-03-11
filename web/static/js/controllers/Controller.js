@@ -40,7 +40,8 @@ app.controller('ContactController', function ($scope, $http) {
         data_out["variables"] = $scope.variables
         $scope.busy = true
         $http({
-            url: 'http://188.226.143.52:80/datasets/' + $scope.dataset,
+            //url: 'http://188.226.143.52:80/datasets/' + $scope.dataset,
+            url: 'http://127.0.0.1:5000/datasets/' + $scope.dataset,
             method: "POST",
             data: data_out,
             headers: {'Content-Type': 'text/javascript'}

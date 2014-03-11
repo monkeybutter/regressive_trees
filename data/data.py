@@ -75,7 +75,7 @@ class Data(object):
 
     def get_left(self, index, var_name, var_type):
 
-        if var_type == 'circular':
+        if var_type == 'circular' or var_type == 'date' or var_type == 'time':
 
             if index <= 0:
                 return None
@@ -91,8 +91,6 @@ class Data(object):
                 left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
                 left_data.var_limits = copy.deepcopy(self.var_limits)
                 left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
-                #print('Left start {}'.format(self.var_limits[var_name]['start']))
-                #print('Left end {}'.format(mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])))
                 left_data.var_limits[var_name]['end'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
                 return left_data
 
@@ -120,7 +118,7 @@ class Data(object):
 
     def get_right(self, index, var_name, var_type):
 
-        if var_type == 'circular':
+        if var_type == 'circular' or var_type == 'date' or var_type == 'time':
             if index <= 0:
                 right_data = Data(self.df, self.class_var, self.var_types)
                 right_data.var_limits = copy.deepcopy(self.var_limits)

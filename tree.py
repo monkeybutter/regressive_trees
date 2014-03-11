@@ -4,6 +4,7 @@ import numpy as np
 import json
 from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
+from util import angle_to_time, angle_to_date
 
 class Node(object):
     def __init__(self):
@@ -47,6 +48,7 @@ class Tree(object):
         best_right = None
 
         for variable, dict in data.var_limits.iteritems():
+            print variable
             splitter = SplitterFactory(dict['type'], criteria)
             score, left_df, right_df = splitter.get_split_values(data, variable)
             if score > best_score:
@@ -61,6 +63,10 @@ class Tree(object):
         node.split_values = best_left.var_limits[best_var]['start'], best_left.var_limits[best_var]['end'], best_right.var_limits[best_var]['start'], best_right.var_limits[best_var]['end']
         node.score = best_score
         node.members = data.df.shape[0]
+
+        print 'selected!'
+        print best_var
+        print data.df.shape[0]
 
         if best_left.df.shape[0]>min_leaf and np.var(best_left.df[data.class_var])!=0.0 and np.var(best_left.df[best_var])!=0.0:
             node.left_child = self.tree_grower(best_left,min_leaf)
@@ -112,6 +118,12 @@ class Tree(object):
         tree_dict['var_name'] = tree.split_var
         tree_dict['var_type'] = tree.var_type
         tree_dict['var_limits'] = tree.split_values
+        if tree.var_type == 'time':
+            tree_dict['var_limits'] = angle_to_time(tree.split_values[0]).strftime("%H:%M"), angle_to_time(tree.split_values[1]).strftime("%H:%M"), angle_to_time(tree.split_values[2]).strftime("%H:%M"), angle_to_time(tree.split_values[3]).strftime("%H:%M")
+        elif tree.var_type == 'date':
+            tree_dict['var_limits'] = angle_to_date(tree.split_values[0]).strftime("%b %d"), angle_to_date(tree.split_values[1]).strftime("%b %d"), angle_to_date(tree.split_values[2]).strftime("%b %d"), angle_to_date(tree.split_values[3]).strftime("%b %d")
+        else:
+            tree_dict['var_limits'] = tree.split_values
         tree_dict['children'] = []
 
         if tree.left_child != None:

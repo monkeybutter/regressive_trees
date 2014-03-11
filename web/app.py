@@ -12,6 +12,8 @@ import sys
 sys.path.append("../")
 from tree import *
 from data.data import Data
+from util import date_to_angle, time_to_angle
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -74,20 +76,26 @@ def tree(name):
 
     df = pandas.read_csv("static/data/" + name + ".csv")
 
+    var_list = ['date', 'time', 'windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']
+    var_types = ['date', 'time', 'circular', 'linear', 'linear', 'linear', 'linear']
+
     df = df[var_list]
 
-    df = df.sort([class_var])
-    df.index = range(0,len(df))
+    df.date = df.date.apply(lambda d: date_to_angle(datetime.strptime(d, "%Y-%m-%d").date()))
+    df.time = df.time.apply(lambda d: time_to_angle(datetime.strptime(d, "%H:%M").time()))
 
+    df = df.sort([class_var])
+    df.index = range(0, len(df))
 
     data = Data(df, class_var, var_types)
 
     tree = Tree()
 
-    node = tree.tree_grower(data,min_leaf)
+    node = tree.tree_grower(data, min_leaf)
     #print tree.tree_to_dict(node, "O")
 
     return Response(tree.tree_to_dict(node, "O"),  mimetype='application/json')
 
 if __name__ == "__main__":
-    app.run(host='188.226.143.52',port=80)
+    #app.run(host='188.226.143.52',port=80)
+    app.run()

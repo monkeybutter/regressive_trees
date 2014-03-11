@@ -72,8 +72,8 @@ class DateSplitter(Splitter):
         for index in range(1, data.df.shape[0]-1):
             if prev_val != data.df[pred_var].iloc[index]:
 
-                left_data = data.get_left(index, pred_var, 'circular')
-                right_data = data.get_right(index, pred_var, 'circular')
+                left_data = data.get_left(index, pred_var, 'date')
+                right_data = data.get_right(index, pred_var, 'date')
 
                 score = self.criteria.get_value(left_data, right_data)
 
@@ -84,7 +84,7 @@ class DateSplitter(Splitter):
                 prev_val = data.df[pred_var].iloc[index]
 
         # sequence indexing is [start_pos:end_pos(excluded)]
-        return best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')
+        return best_score, data.get_left(best_index, pred_var, 'date'), data.get_right(best_index, pred_var, 'date')
 
 
     def _first_run(self, data, pred_var):
@@ -94,7 +94,7 @@ class DateSplitter(Splitter):
 
         data.df = data.df[np.isfinite(data.df[pred_var])]
         data.df = data.df.sort([pred_var])
-        data.df.index = range(0,len(data.df))
+        data.df.index = range(0, len(data.df))
 
         shifter = self._shif_data(data, pred_var)
 

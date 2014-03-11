@@ -1,30 +1,13 @@
 __author__ = 'SmartWombat'
 from datetime import datetime
 import math
-import pandas
+from datetime import date, time, timedelta
+import calendar
 
 
 def circular_distance(ang_a, ang_b):
 
     return 1-math.cos(ang_a-ang_b)
-
-
-def yearly_distance(date_a, date_b):
-    date_a = datetime(2012, date_a.month, date_a.day, date_a.hour, date_a.minute, date_a.second)
-    date_b = datetime(2012, date_b.month, date_b.day, date_b.hour, date_b.minute, date_b.second)
-
-    dist = abs((date_a-date_b).days)
-
-    return min(dist, 366-dist)
-
-
-def daily_distance(date_a, date_b):
-    date_a = datetime(2012, 1, 1, date_a.hour, date_a.minute, date_a.second)
-    date_b = datetime(2012, 1, 1, date_b.hour, date_b.minute, date_b.second)
-
-    dist = abs((date_a-date_b).seconds)
-
-    return min(dist, 24*60*60-dist)
 
 
 def mid_angle(ang_a, ang_b):
@@ -43,13 +26,7 @@ def _bearing_average_in_arc(data, var_name):
     avg = _bearing_average(data.df, var_name)
 
     return avg
-    """
 
-    if _contained_in_arc(data.var_limits[var_name].start, data.var_limits[var_name].end, avg):
-        return avg
-    else:
-        return (avg+180) % 360
-    """
 
 def _bearing_average(df, pred_var):
     #input in Degrees [0-360]
@@ -107,6 +84,7 @@ def sort_in_arc(df, bearing_a, bearing_b, pred_var):
     else:
         raise Exception('This call should not happen!')
 
+
 def _contained_in_arc(bearing_a, bearing_b, value):
     if bearing_a < bearing_b:
         if value < bearing_b and value > bearing_a:
@@ -118,3 +96,29 @@ def _contained_in_arc(bearing_a, bearing_b, value):
             return True
         else:
             return False
+
+
+def angle_to_date(angle):
+    _date = timedelta(seconds=365 * 86400.0 * angle / 360.0)
+    first_day = datetime(2012, 1, 1, 0, 0)
+    return (first_day + _date).date()
+
+
+def date_to_angle(a_date):
+    if calendar.isleap(a_date.year):
+        return 360.0*a_date.timetuple().tm_yday/366.0
+
+    else:
+        return 360.0*a_date.timetuple().tm_yday/365.0
+
+
+def angle_to_time(angle):
+
+    _time = timedelta(seconds=86400.0 * angle / 360.0)
+    first_day = datetime(2012, 1, 1, 0, 0)
+    return (first_day + _time).time()
+
+
+def time_to_angle(a_time):
+
+    return 360.0*(a_time.hour*3600+a_time.minute*60+a_time.second)/86400.0

@@ -76,6 +76,9 @@
                                     else if (d.source.var_type == 'circular') {
                                         return '[' + d.source.var_limits[0] + ', ' + d.source.var_limits[1] + ')';
                                     }
+                                    else if (d.source.var_type == 'date' || d.source.var_type == 'time') {
+                                        return d.source.var_limits[0] + ' / ' + d.source.var_limits[1];
+                                    }
                                 }
                                 else if (d.target.name.slice(-1) == 'R') {
                                     if (d.source.var_type == 'linear') {
@@ -83,6 +86,9 @@
                                     }
                                     else if (d.source.var_type == 'circular') {
                                         return '[' + d.source.var_limits[2] + ', ' + d.source.var_limits[3] + ')';
+                                    }
+                                    else if (d.source.var_type == 'date' || d.source.var_type == 'time') {
+                                        return d.source.var_limits[2] + ' / ' + d.source.var_limits[3];
                                     }
                                 }
                             });
