@@ -105,11 +105,14 @@ def angle_to_date(angle):
 
 
 def date_to_angle(a_date):
+    # Limit time values to 36
     if calendar.isleap(a_date.year):
-        return 360.0*a_date.timetuple().tm_yday/366.0
+        #return 360.0*a_date.timetuple().tm_yday/366.0
+        return 100.0*int(a_date.timetuple().tm_yday/10.0)
 
     else:
-        return 360.0*a_date.timetuple().tm_yday/365.0
+        #return 360.0*a_date.timetuple().tm_yday/365.0
+        return 10.0*int(a_date.timetuple().tm_yday/10.0)
 
 
 def angle_to_time(angle):
@@ -121,4 +124,6 @@ def angle_to_time(angle):
 
 def time_to_angle(a_time):
 
-    return 360.0*(a_time.hour*3600+a_time.minute*60+a_time.second)/86400.0
+    #return 360.0*(a_time.hour*3600+a_time.minute*60+a_time.second)/86400.0
+    # Limit time values to 24
+    return 360.0*a_time.hour/23

@@ -8,7 +8,7 @@ import numpy as np
 from data.data import Data
 
 
-df = pandas.read_csv("./web/static/data/data.csv")
+df = pandas.read_csv("./web/static/data/LEVTdatetime.csv")
 
 df = df[['date', 'time', 'windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
 #df = df[['windSpeed', 'temp', 'dewPoint', 'pressure']]
@@ -18,15 +18,12 @@ df = df[['date', 'time', 'windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']
 class_var = 'windSpeed'
 var_types = ['date', 'time', 'circular', 'linear', 'linear', 'linear', 'linear']
 #df = df[np.isfinite(df[class_var])]
-df = df.sort([class_var])
-df.index = range(0, len(df))
+#df = df.sort([class_var])
+#df.index = range(0, len(df))
 
-df.date = df.date.apply(lambda d: date_to_angle(datetime.strptime(d, "%Y-%m-%d").date()))
-df.time = df.time.apply(lambda d: time_to_angle(datetime.strptime(d, "%H:%M").time()))
-
-data = Data(df, class_var, var_types)
+data = Data(df, class_var, var_types, True)
 tree = Tree()
-node = tree.tree_grower(data, 50)
+node = tree.tree_grower(data, 3000)
 
 #tree.tree_runner(node, "O")
 print tree.tree_to_dict(node, "O")

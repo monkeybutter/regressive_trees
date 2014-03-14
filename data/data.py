@@ -1,6 +1,7 @@
 __author__ = 'SmartWombat'
 
-from util import mid_angle, sort_in_arc
+from util import mid_angle, time_to_angle, date_to_angle
+from datetime import datetime
 import copy
 
 class Data(object):
@@ -8,7 +9,7 @@ class Data(object):
     __class_description__ = """Abstract class for an tree dataframe"""
     __version__ = 0.1
 
-    def __init__(self, df, class_var, var_types):
+    def __init__(self, df, class_var, var_types, first):
         r"""Class constructor.
 
         Initialise the class' attributes. PEP-8 mentions using a leading
@@ -44,6 +45,12 @@ class Data(object):
         self._set_class_type()
 
         for idx, variable in enumerate(df.columns):
+            if first:
+                if var_types[idx] == 'date':
+                    self.df[variable] = self.df[variable].apply(lambda d: date_to_angle(datetime.strptime(d, "%Y-%m-%d").date()))
+                elif var_types[idx] == 'time':
+                    self.df[variable] = self.df[variable].apply(lambda d: time_to_angle(datetime.strptime(d, "%H:%M").time()))
+
             #print "class var: " + class_var
             if variable != class_var:
                 #print "limits for variable: " + variable
@@ -67,7 +74,7 @@ class Data(object):
 
     def get_copy(self):
 
-        data_copy = Data(self.df, self.class_var, self.var_types)
+        data_copy = Data(self.df, self.class_var, self.var_types, False)
         data_copy.var_limits = copy.deepcopy(self.var_limits)
 
         return data_copy
@@ -81,14 +88,14 @@ class Data(object):
                 return None
 
             elif index >= self.df.shape[0]-1:
-                left_data = Data(self.df, self.class_var, self.var_types)
+                left_data = Data(self.df, self.class_var, self.var_types, False)
                 left_data.var_limits = copy.deepcopy(self.var_limits)
                 left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
                 left_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
                 return left_data
 
             else:
-                left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
+                left_data = Data(self.df.iloc[:index], self.class_var, self.var_types, False)
                 left_data.var_limits = copy.deepcopy(self.var_limits)
                 left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
                 left_data.var_limits[var_name]['end'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
@@ -99,14 +106,14 @@ class Data(object):
                 return None
 
             elif index >= self.df.shape[0]-1:
-                left_data = Data(self.df, self.class_var, self.var_types)
+                left_data = Data(self.df, self.class_var, self.var_types, False)
                 left_data.var_limits = copy.deepcopy(self.var_limits)
                 left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
                 left_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
                 return left_data
 
             else:
-                left_data = Data(self.df.iloc[:index], self.class_var, self.var_types)
+                left_data = Data(self.df.iloc[:index], self.class_var, self.var_types, False)
                 left_data.var_limits = copy.deepcopy(self.var_limits)
                 left_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
                 left_data.var_limits[var_name]['end'] = (self.df[var_name].iloc[index-1] + self.df[var_name].iloc[index]) / 2.0
@@ -120,7 +127,7 @@ class Data(object):
 
         if var_type == 'circular' or var_type == 'date' or var_type == 'time':
             if index <= 0:
-                right_data = Data(self.df, self.class_var, self.var_types)
+                right_data = Data(self.df, self.class_var, self.var_types, False)
                 right_data.var_limits = copy.deepcopy(self.var_limits)
                 right_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
@@ -130,7 +137,7 @@ class Data(object):
                 return None
 
             else:
-                right_data = Data(self.df.iloc[index:], self.class_var, self.var_types)
+                right_data = Data(self.df.iloc[index:], self.class_var, self.var_types, False)
                 right_data.var_limits = copy.deepcopy(self.var_limits)
                 right_data.var_limits[var_name]['start'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
@@ -138,7 +145,7 @@ class Data(object):
 
         elif var_type == 'linear':
             if index <= 0:
-                right_data = Data(self.df, self.class_var, self.var_types)
+                right_data = Data(self.df, self.class_var, self.var_types, False)
                 right_data.var_limits = copy.deepcopy(self.var_limits)
                 right_data.var_limits[var_name]['start'] = self.var_limits[var_name]['start']
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
@@ -148,7 +155,7 @@ class Data(object):
                 return None
 
             else:
-                right_data = Data(self.df.iloc[index:], self.class_var, self.var_types)
+                right_data = Data(self.df.iloc[index:], self.class_var, self.var_types, False)
                 right_data.var_limits = copy.deepcopy(self.var_limits)
                 right_data.var_limits[var_name]['start'] = (self.df[var_name].iloc[index-1] + self.df[var_name].iloc[index]) / 2.0
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']

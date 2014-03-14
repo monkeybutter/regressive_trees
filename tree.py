@@ -58,15 +58,14 @@ class Tree(object):
                 best_left = left_df
                 best_right = right_df
 
+        print 'selercted'
+        print best_var
+
         node.split_var = best_var
         node.var_type = best_type
         node.split_values = best_left.var_limits[best_var]['start'], best_left.var_limits[best_var]['end'], best_right.var_limits[best_var]['start'], best_right.var_limits[best_var]['end']
         node.score = best_score
         node.members = data.df.shape[0]
-
-        print 'selected!'
-        print best_var
-        print data.df.shape[0]
 
         if best_left.df.shape[0]>min_leaf and np.var(best_left.df[data.class_var])!=0.0 and np.var(best_left.df[best_var])!=0.0:
             node.left_child = self.tree_grower(best_left,min_leaf)
