@@ -143,6 +143,7 @@ class Data(object):
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
                 return right_data
 
+
         elif var_type == 'linear':
             if index <= 0:
                 right_data = Data(self.df, self.class_var, self.var_types, False)
