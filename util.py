@@ -45,6 +45,10 @@ def _bearing_average(df, pred_var):
         return avg
 
 
+def circular_mean(data):
+    #input in Degrees [0-360]
+    return _bearing_average_in_arc(data, data.class_var)
+
 def circular_heterogeneity(data):
     #input in Degrees [0-360]
 

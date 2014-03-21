@@ -4,7 +4,7 @@ import numpy as np
 import json
 from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
-from util import angle_to_time, angle_to_date
+from util import angle_to_time, angle_to_date, circular_mean
 
 class Node(object):
     def __init__(self):
@@ -58,7 +58,7 @@ class Tree(object):
                 best_left = left_df
                 best_right = right_df
 
-        print 'selercted'
+        print 'selected'
         print best_var
 
         node.split_var = best_var
@@ -71,7 +71,8 @@ class Tree(object):
             node.left_child = self.tree_grower(best_left,min_leaf)
         else:
             left_leaf = Leaf()
-            left_leaf.value = np.mean(best_left.df[data.class_var])
+            #left_leaf.value = np.mean(best_left.df[data.class_var])
+            left_leaf.value = self._get_leaf_value(best_left)
             left_leaf.members = best_left.df.shape[0]
             node.left_child = left_leaf
 
@@ -79,11 +80,25 @@ class Tree(object):
             node.right_child = self.tree_grower(best_right,min_leaf)
         else:
             right_leaf = Leaf()
-            right_leaf.value = np.mean(best_right.df[data.class_var])
+            #right_leaf.value = np.mean(best_right.df[data.class_var])
+            right_leaf.value = self._get_leaf_value(best_right)
             right_leaf.members = best_right.df.shape[0]
             node.right_child = right_leaf
 
         return node
+
+    def _get_leaf_value(self, data):
+        print "it's a " + data.class_type
+        if data.class_type == 'linear':
+            return np.mean(data.df[data.class_var])
+        elif data.class_type == 'circular':
+            return circular_mean(data)
+        elif data.class_type == 'date':
+            return angle_to_date(circular_mean(data))
+        elif data.class_type == 'time':
+            return angle_to_time(circular_mean(data))
+        else:
+            raise Exception
 
     def tree_runner(self, tree, track):
         print('Node location: {}'.format(track))
