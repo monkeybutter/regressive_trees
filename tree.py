@@ -5,6 +5,7 @@ import json
 from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
 from util import angle_to_time, angle_to_date, circular_mean
+from datetime import date, time
 
 class Node(object):
     def __init__(self):
@@ -48,7 +49,7 @@ class Tree(object):
         best_right = None
 
         for variable, dict in data.var_limits.iteritems():
-            print variable
+            #print variable
             splitter = SplitterFactory(dict['type'], criteria)
             score, left_df, right_df = splitter.get_split_values(data, variable)
             if score > best_score:
@@ -58,8 +59,8 @@ class Tree(object):
                 best_left = left_df
                 best_right = right_df
 
-        print 'selected'
-        print best_var
+        #print 'selected'
+        #print best_var
 
         node.split_var = best_var
         node.var_type = best_type
@@ -94,8 +95,12 @@ class Tree(object):
         elif data.class_type == 'circular':
             return circular_mean(data)
         elif data.class_type == 'date':
+            print circular_mean(data)
+            print angle_to_date(circular_mean(data))
             return angle_to_date(circular_mean(data))
         elif data.class_type == 'time':
+            print circular_mean(data)
+            print angle_to_time(circular_mean(data))
             return angle_to_time(circular_mean(data))
         else:
             raise Exception
@@ -148,7 +153,12 @@ class Tree(object):
                 leaf = {}
                 leaf['name'] = track+'L'
                 leaf['members'] = tree.left_child.members
-                leaf['value'] = '{0:.2f}'.format(tree.left_child.value)
+                if isinstance(tree.left_child.value, float):
+                    leaf['value'] = '{0:.2f}'.format(tree.left_child.value)
+                if isinstance(tree.left_child.value, time):
+                    leaf['value'] = tree.left_child.value.strftime('%H:%M')
+                if isinstance(tree.left_child.value, date):
+                    leaf['value'] = tree.left_child.value.strftime('%b %d')
                 tree_dict['children'].append(leaf)
 
 
@@ -160,7 +170,12 @@ class Tree(object):
                 leaf = {}
                 leaf['name'] = track+'R'
                 leaf['members'] = tree.right_child.members
-                leaf['value'] = '{0:.2f}'.format(tree.right_child.value)
+                if isinstance(tree.right_child.value, float):
+                    leaf['value'] = '{0:.2f}'.format(tree.right_child.value)
+                if isinstance(tree.right_child.value, time):
+                    leaf['value'] = tree.right_child.value.strftime('%H:%M')
+                if isinstance(tree.right_child.value, date):
+                    leaf['value'] = tree.right_child.value.strftime('%b %d')
                 tree_dict['children'].append(leaf)
 
         return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")
