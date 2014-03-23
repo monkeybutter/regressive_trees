@@ -116,7 +116,6 @@ class CircularSplitter(Splitter):
 
         shifted_data = data.get_copy()
         prev_element = None
-
         for i in range(data.df.shape[0]):
             if data.df[pred_var][i] != prev_element:
                 shifted_data.df = data.df[i:].append(data.df[:i])

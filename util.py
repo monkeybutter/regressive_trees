@@ -89,7 +89,7 @@ def sort_in_arc(df, bearing_a, bearing_b, pred_var):
         raise Exception('This call should not happen!')
 
 
-def _contained_in_arc(bearing_a, bearing_b, value):
+def contained_in_arc(bearing_a, bearing_b, value):
     if bearing_a < bearing_b:
         if value < bearing_b and value > bearing_a:
             return True
@@ -110,9 +110,10 @@ def angle_to_date(angle):
 
 def date_to_angle(a_date):
     # Limit time values to 36
+    # TODO
     if calendar.isleap(a_date.year):
         #return 360.0*a_date.timetuple().tm_yday/366.0
-        return 100.0*int(a_date.timetuple().tm_yday/10.0)
+        return 10.0*int(a_date.timetuple().tm_yday/10.0)
 
     else:
         #return 360.0*a_date.timetuple().tm_yday/365.0

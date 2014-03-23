@@ -8,7 +8,7 @@ from data.data import Data
 df = pandas.read_csv("./web/static/data/YSSY.csv")
 
 df = df[['date', 'time', 'windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
-df = df[:500]
+df = df[:10000]
 #df = df[:10000:20]
 
 print df.shape
@@ -16,7 +16,7 @@ print df.shape
 
 
 
-class_var = 'time'
+class_var = 'temp'
 #var_types = ['circular', 'linear', 'linear', 'linear', 'linear']
 var_types = ['date', 'time', 'circular', 'linear', 'linear', 'linear', 'linear']
 #var_types = ['circular', 'linear', 'linear']

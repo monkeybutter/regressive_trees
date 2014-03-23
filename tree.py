@@ -49,7 +49,6 @@ class Tree(object):
         best_right = None
 
         for variable, dict in data.var_limits.iteritems():
-            #print variable
             splitter = SplitterFactory(dict['type'], criteria)
             score, left_df, right_df = splitter.get_split_values(data, variable)
             if score > best_score:
@@ -58,9 +57,6 @@ class Tree(object):
                 best_score = score
                 best_left = left_df
                 best_right = right_df
-
-        #print 'selected'
-        #print best_var
 
         node.split_var = best_var
         node.var_type = best_type
@@ -89,7 +85,6 @@ class Tree(object):
         return node
 
     def _get_leaf_value(self, data):
-        print "it's a " + data.class_type
         if data.class_type == 'linear':
             return np.mean(data.df[data.class_var])
         elif data.class_type == 'circular':
@@ -129,7 +124,6 @@ class Tree(object):
                 print('Leaf location: {}'.format(track+'Rx'))
                 print('Leaf members: {}'.format(tree.right_child.members))
                 print('Value {}'.format(tree.right_child.value))
-
 
     def tree_to_dict(self, tree, track):
         tree_dict = {}

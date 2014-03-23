@@ -51,7 +51,6 @@ class LinearSplitter(Splitter):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
-
         #TODO Filter before calling tree
         # Drop NaNs and sort under pred_var values
         data.df = data.df[np.isfinite(data.df[pred_var])]
