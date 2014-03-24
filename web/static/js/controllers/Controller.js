@@ -6,6 +6,8 @@ app.controller('ContactController', function ($scope, $http) {
 
     $scope.busy = false
 
+    $scope.var_types = ['linear', 'circular', 'date', 'time']
+
     $http.get("datasets").success(function (data) {
         $scope.datasets = data;
     }).error(function () {
@@ -18,7 +20,7 @@ app.controller('ContactController', function ($scope, $http) {
             $scope.rows = data.rows;
             $scope.head = data.head;
             console.log(data.descriptor)
-            $scope.var_name = $scope.variables[0].var_name;
+            //$scope.var_name = $scope.variables[0].var_name;
 
         }).error(function () {
             alert("Unexpected error!")

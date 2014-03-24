@@ -61,7 +61,7 @@
                     <tr>
                         <th>#</th>
                         <th>Variable Name</th>
-                        <th>Circular</th>
+                        <th>Var Type</th>
                         <th>Class</th>
                     </tr>
                     </thead>
@@ -69,7 +69,8 @@
                     <tr ng-repeat="var in variables">
                         <td>{{ $index+1 }}</td>
                         <td>{{ var.var_name }}</td>
-                        <td><input type="checkbox" ng-model="var.circular"></td>
+                        <td><select class="form-control" ng-model="var.var_type" ng-options="var_type for var_type in var_types"></select></td>
+                        <!-- <td><input type="text" ng-model="var.var_type"></td> -->
                         <td><input type="checkbox" ng-model="var.class_var" ng-change="check_class(var.var_name)"></td>
                     </tr>
 

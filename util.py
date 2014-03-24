@@ -91,7 +91,7 @@ def sort_in_arc(df, bearing_a, bearing_b, pred_var):
 
 def contained_in_arc(bearing_a, bearing_b, value):
     if bearing_a < bearing_b:
-        if value < bearing_b and value > bearing_a:
+        if value <= bearing_b and value >= bearing_a:
             return True
         else:
             return False
