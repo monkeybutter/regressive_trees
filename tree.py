@@ -49,6 +49,7 @@ class Tree(object):
         best_right = None
 
         for variable, dict in data.var_limits.iteritems():
+            print(variable)
             splitter = SplitterFactory(dict['type'], criteria)
             score, left_df, right_df = splitter.get_split_values(data, variable)
             if score > best_score:
@@ -57,6 +58,8 @@ class Tree(object):
                 best_score = score
                 best_left = left_df
                 best_right = right_df
+
+        print("Best var: " + best_var)
 
         node.split_var = best_var
         node.var_type = best_type

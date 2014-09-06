@@ -9,8 +9,8 @@ from data.data import Data
 
 for i in range(20):
 
-    df = pandas.read_csv("./web/static/data/EGLL.csv")
-    df = df[['time', 'windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
+    df = pandas.read_csv("./web/static/data/egll.csv")
+    df = df[[u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'metar_wind_spd', u'gfs_press', u'gfs_rh', u'gfs_temp', u'gfs_wind_dir', u'gfs_wind_spd', u'time', u'date']]
 
     rows = random.sample(df.index, 23000)
     train_df = df.ix[rows]
