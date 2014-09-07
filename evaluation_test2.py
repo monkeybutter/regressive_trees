@@ -2,13 +2,12 @@ __author__ = 'SmartWombat'
 
 import pandas
 import random
-import numpy as np
 from tree import Tree
-from evaluator import evaluate_dataset, _evaluate_value
+from evaluator import evaluate_dataset
 from data.data import Data
 
 
-df = pandas.read_csv("./web/static/data/egll.csv")
+df = pandas.read_csv("./data/yssy.csv")
 print(df.columns)
 print(df.shape)
 
@@ -27,7 +26,7 @@ tree = Tree()
 #node1 = tree.tree_grower(data1, 2000)
 #node2 = tree.tree_grower(data2, 2000)
 print("IPS")
-node = tree.tree_grower(data, 1000)
+node = tree.tree_grower(data, 500)
 print("OUI")
 
 print 'London'

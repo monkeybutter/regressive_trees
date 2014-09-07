@@ -14,6 +14,13 @@ def evaluate_dataset(class_var, tree, df):
         acum_sq_error += (real_val - pred_val)**2
     return sqrt(acum_sq_error/total_values)
 
+# Error: metar - gfs
+def raw_evaluate_dataset(class_var, tree, df):
+    result = []
+    for index, row in df.iterrows():
+        result.append(row[class_var] - _evaluate_value(tree, row))
+    return result
+
 
 def _evaluate_value(tree, data_row):
     if tree.get_name() == 'Node':
