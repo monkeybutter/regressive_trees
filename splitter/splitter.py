@@ -81,3 +81,18 @@ class Splitter(object):
             If the function hasn't been implemented yet.
         """
         raise NotImplementedError('I need to be implemented!')
+
+    def get_split_values_queue(self, queue, df, class_var, pred_var, bearing_a=None, bearing_b=None):
+        r"""Returns a value with the average height of crop
+
+        Returns
+        -------
+        float
+            Average height of crop
+
+        Raises
+        ------
+        NotImplementedError
+            If the function hasn't been implemented yet.
+        """
+        raise NotImplementedError('I need to be implemented!')
