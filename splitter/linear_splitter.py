@@ -120,5 +120,5 @@ class LinearSplitter(Splitter):
 
         # sequence indexing is [start_pos:end_pos(excluded)]
 
-        queue.put(best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear'))
+        queue.put((best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')))
         return True

@@ -66,9 +66,7 @@ class Tree(object):
             p.join()
 
         for p in processes:
-            score = queue.get()
-            left_df = queue.get()
-            right_df = queue.get()
+            score, left_df, right_df= queue.get()
             if score > best_score:
                 best_var = variable
                 best_type = dict['type']

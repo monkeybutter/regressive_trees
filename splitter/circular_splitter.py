@@ -118,7 +118,7 @@ class CircularSplitter(Splitter):
 
                 prev_val = data.df[pred_var].iloc[index]
 
-        queue.put(best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular'))
+        queue.put((best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')))
         return True
 
     def _first_run_queue(self, queue, data, pred_var):
@@ -143,7 +143,7 @@ class CircularSplitter(Splitter):
                 best_left = left_ang_df
                 best_right = right_ang_df
 
-        queue.put(best_score, best_left, best_right)
+        queue.put((best_score, best_left, best_right))
         return True
 
 
