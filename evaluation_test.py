@@ -38,7 +38,7 @@ for i in range(20):
     print('Including time: {}'.format(evaluate_dataset(class_var, node3, test_df)))
 
 """
-    df = pandas.read_csv("./web/static/data/YSSY.csv")
+    df = pandas.read_csv("./web/static/data/yssy.csv")
     df = df[['time', 'windDir', 'windSpeed', 'temp', 'dewPoint', 'pressure']]
 
     rows = random.sample(df.index, 23000)

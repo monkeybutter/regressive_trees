@@ -18,11 +18,9 @@ for airport in airports:
     for class_var in class_vars:
         var_types = ['linear', 'linear', 'linear', 'circular', 'linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'time', 'date']
 
-        print 'Sydney'
-
         bin_sizes = [100, 250, 500]
         for bin_size in bin_sizes:
-
+            print("{} {} {}".format(airport, class_var, bin_size))
             result = []
             for i in range(5):
                 print(i)
@@ -34,7 +32,7 @@ for airport in airports:
                 node = tree.tree_grower(data, bin_size)
                 result.extend(raw_evaluate_dataset(class_var, node, test_df))
 
-            with open('/home/roz016/Dropbox/Data for Tree/Results/' + airport + '_' + class_var + '_' + bin_size + '.json', 'w') as outfile:
+            with open('/home/roz016/Dropbox/Data for Tree/Results/' + airport + '_' + class_var + '_' + str(bin_size) + '.json', 'w') as outfile:
                 json.dump(data, outfile)
 
 
