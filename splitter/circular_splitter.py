@@ -87,17 +87,17 @@ class CircularSplitter(Splitter):
         return best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')
 
 
-    def get_split_values_queue(self, queue, data, pred_var):
+    def get_split_values_queue(self, queue, data, pred_var, type_var):
 
         if data.var_limits[pred_var]['start'] == None or data.var_limits[pred_var]['end'] == None:
-            return self._first_run_queue(queue, data, pred_var)
+            return self._first_run_queue(queue, data, pred_var, type_var)
 
         else:
             data.df = sort_in_arc(data.df, data.var_limits[pred_var]['start'], data.var_limits[pred_var]['end'], pred_var)
-            return self._get_split_values_queue(queue, data, pred_var)
+            return self._get_split_values_queue(queue, data, pred_var, type_var)
 
 
-    def _get_split_values_queue(self, queue, data, pred_var):
+    def _get_split_values_queue(self, queue, data, pred_var, type_var):
 
         best_score = 0
         best_index = None
@@ -118,10 +118,10 @@ class CircularSplitter(Splitter):
 
                 prev_val = data.df[pred_var].iloc[index]
 
-        queue.put((best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')))
+        queue.put((pred_var, type_var, best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')))
         return True
 
-    def _first_run_queue(self, queue, data, pred_var):
+    def _first_run_queue(self, queue, data, pred_var, type_var):
         best_score = 0
         best_left = None
         best_right = None
@@ -143,7 +143,7 @@ class CircularSplitter(Splitter):
                 best_left = left_ang_df
                 best_right = right_ang_df
 
-        queue.put((best_score, best_left, best_right))
+        queue.put((pred_var, type_var, best_score, best_left, best_right))
         return True
 
 

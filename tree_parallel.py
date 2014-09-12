@@ -6,7 +6,7 @@ from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
 from util import angle_to_time, angle_to_date, circular_mean
 from datetime import date, time
-from multiprocessing import Process, Queue, Manager
+from multiprocessing import Process, Manager
 
 class Node(object):
     def __init__(self):
@@ -33,9 +33,6 @@ class Leaf(object):
 
 class Tree(object):
 
-    #def __init__(self):
-
-
     def tree_grower(self, data, min_leaf):
 
         criteria = CriteriaFactory(data.class_type, data.class_var)
@@ -50,14 +47,12 @@ class Tree(object):
         best_right = None
 
         processes = []
-        #queue = Queue()
         manager = Manager()
         queue = manager.Queue()
 
-        for variable, dict in data.var_limits.iteritems():
-            print(variable)
-            splitter = SplitterFactory(dict['type'], criteria)
-            p = Process(target=splitter.get_split_values_queue, args=(queue, data, variable))
+        for variable, dic in data.var_limits.iteritems():
+            splitter = SplitterFactory(dic['type'], criteria)
+            p = Process(target=splitter.get_split_values_queue, args=(queue, data, variable, dic['type']))
             processes.append(p)
             p.start()
 
@@ -65,16 +60,16 @@ class Tree(object):
         for p in processes:
             p.join()
 
-        for p in processes:
-            score, left_df, right_df= queue.get()
+        for _ in processes:
+            variable, type_var, score, left_df, right_df = queue.get()
             if score > best_score:
                 best_var = variable
-                best_type = dict['type']
+                best_type = type_var
                 best_score = score
                 best_left = left_df
                 best_right = right_df
 
-        print("Best var: " + best_var)
+        print("Best var: " + best_var + " type " + best_type)
 
         node.split_var = best_var
         node.var_type = best_type

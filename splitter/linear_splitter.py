@@ -80,7 +80,7 @@ class LinearSplitter(Splitter):
         return best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')
 
 
-    def get_split_values_queue(self, queue, data, pred_var):
+    def get_split_values_queue(self, queue, data, pred_var, type_var):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -120,5 +120,5 @@ class LinearSplitter(Splitter):
 
         # sequence indexing is [start_pos:end_pos(excluded)]
 
-        queue.put((best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')))
+        queue.put((pred_var, type_var, best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')))
         return True
