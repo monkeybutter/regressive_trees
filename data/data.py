@@ -36,7 +36,6 @@ class Data(object):
         TODO: how best to document class attributes.
         """
 
-
         self.df = df
         self.class_var = class_var
         self.var_types = var_types
@@ -59,18 +58,15 @@ class Data(object):
                 self.var_limits[variable]['start'] = None
                 self.var_limits[variable]['end'] = None
 
-
     def _set_class_type(self):
         for idx, variable in enumerate(self.df.columns):
             if variable == self.class_var:
                 self.class_type = self.var_types[idx]
 
-
     def sort_by(self, pred_var):
 
         self.df = self.df.sort([pred_var])
         self.df.index = range(0,len(self.df))
-
 
     def get_copy(self):
 
@@ -78,7 +74,6 @@ class Data(object):
         data_copy.var_limits = copy.deepcopy(self.var_limits)
 
         return data_copy
-
 
     def get_left(self, index, var_name, var_type):
 
@@ -122,7 +117,6 @@ class Data(object):
         else:
             raise Exception
 
-
     def get_right(self, index, var_name, var_type):
 
         if var_type == 'circular' or var_type == 'date' or var_type == 'time':
@@ -142,7 +136,6 @@ class Data(object):
                 right_data.var_limits[var_name]['start'] = mid_angle(self.df[var_name].iloc[index-1], self.df[var_name].iloc[index])
                 right_data.var_limits[var_name]['end'] = self.var_limits[var_name]['end']
                 return right_data
-
 
         elif var_type == 'linear':
             if index <= 0:

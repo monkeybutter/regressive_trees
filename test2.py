@@ -8,10 +8,6 @@ from data.data import Data
 from util import cross_validate_splits, cross_validate_group
 import pickle
 
-df = pandas.read_csv("./web/static/data/egll.csv")
-
-cx_val = cross_validate_splits(df, 5)
-
 airports = ['yssy', 'egll', 'zbaa']
 
 for airport in airports:
@@ -43,6 +39,9 @@ for airport in airports:
                 data = Data(tree_df, class_var, var_types, True)
                 tree = Tree()
                 # 100 bin size
-                node = tree.tree_grower(data,100)
+                node = tree.tree_grower(data, 500)
                 # Pickle object
-                pickle.dump(node, '/Users/monkeybutter/Desktop/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rftree' + str(j+1) + '.pick')
+                print(type(node))
+                print(node)
+                with open('/Users/monkeybutter/Desktop/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rftree' + str(j+1) + '.pick', 'w') as f:
+                    pickle.dump(node, f)

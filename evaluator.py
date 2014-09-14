@@ -21,6 +21,17 @@ def raw_evaluate_dataset(class_var, tree, df):
         result.append(row[class_var] - _evaluate_value(tree, row))
     return result
 
+# detail metar - gfs
+def detail_evaluate_dataset(gfs_var, class_var, tree, df):
+    result = []
+    for index, row in df.iterrows():
+        element = {}
+        element[gfs_var] = row[gfs_var]
+        element[class_var] = row[class_var]
+        element['ctree'] = _evaluate_value(tree, row)
+        result.append(element)
+    return result
+
 
 def _evaluate_value(tree, data_row):
     if tree.get_name() == 'Node':
