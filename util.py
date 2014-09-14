@@ -1,8 +1,40 @@
 __author__ = 'SmartWombat'
 from datetime import datetime
+import pandas as pd
 import math
+import random
 from datetime import date, time, timedelta
 import calendar
+
+
+def cross_validate_splits(df, groups):
+
+    dataframes = []
+
+    group_size = int(round(df.shape[0]*.2))
+
+    for i in range(groups-1):
+        rows = random.sample(df.index, group_size)
+        dataframes.append(df.ix[rows])
+        df = df.drop(rows)
+
+    dataframes.append(df)
+
+    return dataframes
+
+
+def cross_validate_group(test_group_pos, dataframes):
+
+    if 0 < test_group_pos < len(dataframes):
+
+        test_df = dataframes[test_group_pos-1]
+        del dataframes[test_group_pos-1]
+        train_df = pd.concat(dataframes)
+
+        return train_df, test_df
+
+    else:
+        raise Exception('Group not in range!')
 
 
 def circular_distance(ang_a, ang_b):

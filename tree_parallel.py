@@ -69,7 +69,7 @@ class Tree(object):
                 best_left = left_df
                 best_right = right_df
 
-        print("Best var: " + best_var + " type " + best_type)
+        #print("Best var: " + best_var + " type " + best_type)
 
         node.split_var = best_var
         node.var_type = best_type

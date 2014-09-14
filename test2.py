@@ -1,31 +1,48 @@
-from multiprocessing import Process, Manager
+__author__ = 'SmartWombat'
+
+import pandas
 import time
+from tree_parallel import Tree
+import random
+from data.data import Data
+from util import cross_validate_splits, cross_validate_group
+import pickle
 
+df = pandas.read_csv("./web/static/data/egll.csv")
 
-def long_process(queue, id):
-    time.sleep(10)
-    queue.put((id, [13,6], {}))
-    return
+cx_val = cross_validate_splits(df, 5)
 
+airports = ['yssy', 'egll', 'zbaa']
 
-processes = []
-#queue = Queue()
-manager = Manager()
-queue = manager.Queue()
+for airport in airports:
+    df = pandas.read_csv("./web/static/data/" + airport + ".csv")
+    df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x/10) * 10)
 
-for id in range(8):
-    p = Process(target=long_process, args=(queue, id))
-    processes.append(p)
-    p.start()
+    class_vars = ['metar_wind_spd', 'metar_press', 'metar_temp']
 
-# Wait for all processes to finish
-for p in processes:
-    p.join()
+    for class_var in class_vars:
+        var_types = ['linear', 'linear', 'linear', 'circular', 'linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'time', 'date']
 
-for p in processes:
-    id, de, di = queue.get()
-    #ida = queue.get()
-    print(id)
-    print(de)
-    print(di)
-    #print(ida)
+        print("{} {}: {}".format(airport, class_var, time.strftime("%c")))
+
+        bin_number = 5
+        cx_val = cross_validate_splits(df, bin_number)
+
+        for i in range(bin_number):
+            train_df, test_df = cross_validate_group(i+1, cx_val)
+
+            print("Bin {}: {}".format(i, time.strftime("%c")))
+
+            trees = []
+            for j in range(50):
+                print("Tree {} of 50: {}".format(j, time.strftime("%c")))
+                # train tree with 70% of the train_df
+                rows = random.sample(train_df.index, int(train_df.shape[0]*.7))
+                tree_df = df.ix[rows]
+
+                data = Data(tree_df, class_var, var_types, True)
+                tree = Tree()
+                # 100 bin size
+                node = tree.tree_grower(data,100)
+                # Pickle object
+                pickle.dump(node, '/Users/monkeybutter/Desktop/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rftree' + str(j+1) + '.pick')
