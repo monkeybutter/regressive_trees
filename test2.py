@@ -27,6 +27,9 @@ for airport in airports:
         for i in range(bin_number):
             train_df, test_df = cross_validate_group(i+1, cx_val)
 
+            with open('/Users/monkeybutter/Desktop/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + 'df' + '.pick', 'w') as f:
+                    pickle.dump(test_df, f)
+
             print("Bin {}: {}".format(i, time.strftime("%c")))
 
             trees = []
@@ -39,7 +42,7 @@ for airport in airports:
                 data = Data(tree_df, class_var, var_types, True)
                 tree = Tree()
                 # 100 bin size
-                node = tree.tree_grower(data, 500)
+                node = tree.tree_grower(data, 100)
                 # Pickle object
                 print(type(node))
                 print(node)

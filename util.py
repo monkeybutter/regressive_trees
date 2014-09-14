@@ -24,12 +24,12 @@ def cross_validate_splits(df, groups):
 
 
 def cross_validate_group(test_group_pos, dataframes):
+    dataframes_copy = dataframes[:]
+    if 0 < test_group_pos <= len(dataframes):
 
-    if 0 < test_group_pos < len(dataframes):
-
-        test_df = dataframes[test_group_pos-1]
-        del dataframes[test_group_pos-1]
-        train_df = pd.concat(dataframes)
+        test_df = dataframes_copy[test_group_pos-1]
+        del dataframes_copy[test_group_pos-1]
+        train_df = pd.concat(dataframes_copy)
 
         return train_df, test_df
 

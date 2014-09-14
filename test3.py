@@ -35,6 +35,8 @@ for airport in airports:
         cx_val = cross_validate_splits(df, bin_number)
 
         for i in range(bin_number):
+            print("Cross Validate {}: {}".format(i, bin_number))
+            print len(cx_val)
             train_df, test_df = cross_validate_group(i+1, cx_val)
 
             print("Bin {}: {}".format(i, time.strftime("%c")))
@@ -45,7 +47,7 @@ for airport in airports:
             data = Data(train_df, class_var, df_types, True)
             tree = Tree()
             # 100 bin size
-            node = tree.tree_grower(data, 100)
+            node = tree.tree_grower(data, 1000)
 
             with open('/Users/monkeybutter/Desktop/' + airport + '_' + class_var + '_bin' + str(i) + '.json', 'w') as outfile:
                 json.dump(detail_evaluate_dataset('gfs' + class_var[5:], class_var, node, test_df), outfile)
