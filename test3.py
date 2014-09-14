@@ -19,6 +19,7 @@ gfs_types = ['linear', 'linear', 'linear', 'circular', 'linear', 'time', 'date']
 
 for airport in airports:
     df_master = pd.read_csv("./web/static/data/" + airport + ".csv")
+    df_master['gfs_wind_dir'] = df_master['gfs_wind_dir'].apply(lambda x: round(x/10) * 10)
 
     class_vars = ['metar_wind_spd', 'metar_wind_dir', 'metar_press', 'metar_temp']
 
@@ -31,11 +32,11 @@ for airport in airports:
         df_types = gfs_types[:]
         df_types.insert(0, metar_types[index])
 
-        bin_number = 5
-        cx_val = cross_validate_splits(df, bin_number)
+        cx_bin_number = 5
+        cx_val = cross_validate_splits(df, cx_bin_number)
 
-        for i in range(bin_number):
-            print("Cross Validate {}: {}".format(i, bin_number))
+        for i in range(cx_bin_number):
+            print("Cross Validate {}: {}".format(i, cx_bin_number+1))
             print len(cx_val)
             train_df, test_df = cross_validate_group(i+1, cx_val)
 
@@ -47,7 +48,7 @@ for airport in airports:
             data = Data(train_df, class_var, df_types, True)
             tree = Tree()
             # 100 bin size
-            node = tree.tree_grower(data, 1000)
+            node = tree.tree_grower(data, 100)
 
-            with open('/Users/monkeybutter/Desktop/' + airport + '_' + class_var + '_bin' + str(i) + '.json', 'w') as outfile:
+            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i) + '.json', 'w') as outfile:
                 json.dump(detail_evaluate_dataset('gfs' + class_var[5:], class_var, node, test_df), outfile)

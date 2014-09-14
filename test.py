@@ -18,7 +18,7 @@ for airport in airports:
     for class_var in class_vars:
         var_types = ['linear', 'linear', 'linear', 'circular', 'linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'time', 'date']
 
-        bin_sizes = [100, 250, 500]
+        bin_sizes = [500, 250, 100]
         for bin_size in bin_sizes:
             print("{} {} {}".format(airport, class_var, bin_size))
             result = []
@@ -33,7 +33,7 @@ for airport in airports:
                 result.extend(raw_evaluate_dataset(class_var, node, test_df))
 
             with open('/home/roz016/Dropbox/Data for Tree/Results/' + airport + '_' + class_var + '_' + str(bin_size) + '.json', 'w') as outfile:
-                json.dump(data, outfile)
+                json.dump(result, outfile)
 
 
 
