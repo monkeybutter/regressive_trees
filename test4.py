@@ -6,10 +6,10 @@ from tree_parallel import Tree
 import random
 from data.data import Data
 from util import cross_validate_splits, cross_validate_group
-from evaluator import detail_evaluate_dataset
-import json
+import pickle
 
-airports = ['yssy', 'egll', 'zbaa']
+#airports = ['yssy', 'egll', 'zbaa']
+airports = ['yssy']
 
 metar_vars = ['metar_press', 'metar_rh', 'metar_temp', 'metar_wind_dir', 'metar_wind_spd']
 metar_types = ['linear', 'linear', 'linear', 'circular', 'linear']
@@ -21,8 +21,8 @@ for airport in airports:
     df_master = pd.read_csv("./web/static/data/" + airport + ".csv")
     df_master['gfs_wind_dir'] = df_master['gfs_wind_dir'].apply(lambda x: round(x/10) * 10)
 
-    #class_vars = ['metar_wind_spd', 'metar_rh', 'metar_press', 'metar_temp']
-    class_vars = ['metar_rh']
+    class_vars = ['metar_wind_spd', 'metar_rh', 'metar_press', 'metar_temp']
+    #class_vars = ['metar_wind_dir']
 
     for class_var in class_vars:
         print class_var
@@ -41,12 +41,26 @@ for airport in airports:
             print len(cx_val)
             train_df, test_df = cross_validate_group(i+1, cx_val)
 
+            # Pickle Random Forest
+            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_cx' + str(i+1) + '_testdf.pick', 'w') as f:
+                pickle.dump(test_df, f)
+
             print("Bin {}: {}".format(i, time.strftime("%c")))
 
-            data = Data(train_df, class_var, df_types, True)
-            tree = Tree()
-            # 100 bin size
-            node = tree.tree_grower(data, 100)
+            trees = []
+            for j in range(50):
+                print("Tree {} of 50: {}".format(j, time.strftime("%c")))
+                # train tree with 70% of the train_df
+                rows = random.sample(train_df.index, int(train_df.shape[0]*.7))
+                randomforest_df = train_df.ix[rows]
 
-            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i) + '.json', 'w') as outfile:
-                json.dump(detail_evaluate_dataset('gfs' + class_var[5:], class_var, node, test_df), outfile)
+                data = Data(randomforest_df, class_var, df_types, True)
+                tree = Tree()
+                # 100 bin size
+                node = tree.tree_grower(data, 100)
+
+                trees.append(node)
+
+            # Pickle Test Dataframe
+            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rf.pick', 'w') as f:
+                pickle.dump(test_df, f)
