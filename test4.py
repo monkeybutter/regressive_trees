@@ -41,7 +41,7 @@ for airport in airports:
             print len(cx_val)
             train_df, test_df = cross_validate_group(i+1, cx_val)
 
-            # Pickle Random Forest
+            # Pickle Test Dataframe
             with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_cx' + str(i+1) + '_testdf.pick', 'w') as f:
                 pickle.dump(test_df, f)
 
@@ -61,6 +61,14 @@ for airport in airports:
 
                 trees.append(node)
 
-            # Pickle Test Dataframe
+            # Pickle Random Forest
             with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rf.pick', 'w') as f:
-                pickle.dump(test_df, f)
+                pickle.dump(trees, f)
+
+            data = Data(train_df, class_var, df_types, True)
+            tree = Tree()
+            # 100 bin size
+            node = tree.tree_grower(data, 100)
+            # Pickle Normal Tree
+            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_tree.pick', 'w') as f:
+                pickle.dump(node, f)
