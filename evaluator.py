@@ -32,6 +32,39 @@ def detail_evaluate_dataset(gfs_var, class_var, tree, df):
         result.append(element)
     return result
 
+# detail metar - gfs
+def detail_evaluate_dataset_rf(gfs_var, class_var, rf, df):
+    result = []
+    for index, row in df.iterrows():
+        element = {}
+        element[gfs_var] = row[gfs_var]
+        element[class_var] = row[class_var]
+        tree_values = []
+        for tree in rf:
+            tree_values.append(_evaluate_value(tree, row))
+        tree_values.sort()
+        tree_values = tree_values[10:40]
+        element['rf'] = sum(tree_values)/len(tree_values)
+        result.append(element)
+    return result
+
+# detail metar - gfs
+def detail_evaluate_dataset_rf_tree(gfs_var, class_var, rf, tree, df):
+    result = []
+    for index, row in df.iterrows():
+        element = {}
+        element[gfs_var] = row[gfs_var]
+        element[class_var] = row[class_var]
+        tree_values = []
+        for tree in rf:
+            tree_values.append(_evaluate_value(tree, row))
+        tree_values.sort()
+        tree_values = tree_values[10:40]
+        element['rf'] = sum(tree_values)/len(tree_values)
+        element['single_tree'] = _evaluate_value(tree, row)
+        result.append(element)
+    return result
+
 
 def _evaluate_value(tree, data_row):
     if tree.get_name() == 'Node':
