@@ -9,7 +9,7 @@ from util import cross_validate_splits, cross_validate_group
 import pickle
 
 #airports = ['yssy', 'egll', 'zbaa']
-airports = ['yssy']
+airports = ['egll']
 
 metar_vars = ['metar_press', 'metar_rh', 'metar_temp', 'metar_wind_dir', 'metar_wind_spd']
 metar_types = ['linear', 'linear', 'linear', 'circular', 'linear']
