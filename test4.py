@@ -9,7 +9,7 @@ from util import cross_validate_splits, cross_validate_group
 import pickle
 
 #airports = ['yssy', 'egll', 'zbaa']
-airports = ['egll']
+airports = ['zbaa']
 
 metar_vars = ['metar_press', 'metar_rh', 'metar_temp', 'metar_wind_dir', 'metar_wind_spd']
 metar_types = ['linear', 'linear', 'linear', 'circular', 'linear']
@@ -42,7 +42,7 @@ for airport in airports:
             train_df, test_df = cross_validate_group(i+1, cx_val)
 
             # Pickle Test Dataframe
-            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_cx' + str(i+1) + '_testdf.pick', 'w') as f:
+            with open('/Users/monkeybutter/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_cx' + str(i+1) + '_testdf.pick', 'w') as f:
                 pickle.dump(test_df, f)
 
             print("Bin {}: {}".format(i, time.strftime("%c")))
@@ -62,7 +62,7 @@ for airport in airports:
                 trees.append(node)
 
             # Pickle Random Forest
-            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rf.pick', 'w') as f:
+            with open('/Users/monkeybutter/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_rf.pick', 'w') as f:
                 pickle.dump(trees, f)
 
             data = Data(train_df, class_var, df_types, True)
@@ -70,5 +70,5 @@ for airport in airports:
             # 100 bin size
             node = tree.tree_grower(data, 100)
             # Pickle Normal Tree
-            with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_tree.pick', 'w') as f:
+            with open('/Users/monkeybutter/Dropbox/Data for Tree/Results/cx5_rf50_bin100/' + airport + '_' + class_var + '_bin100_cx' + str(i+1) + '_tree.pick', 'w') as f:
                 pickle.dump(node, f)

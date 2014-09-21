@@ -16,7 +16,7 @@ def detail_evaluate_dataset(gfs_var, class_var, tree, df):
         result.append(element)
     return result
 
-airports = ['yssy', 'egll', 'zbaa']
+airports = ['yssy', 'egll']
 
 metar_vars = ['metar_press', 'metar_rh', 'metar_temp', 'metar_wind_dir', 'metar_wind_spd']
 metar_types = ['linear', 'linear', 'linear', 'circular', 'linear']
@@ -39,11 +39,12 @@ for airport in airports:
     cx_val = cross_validate_splits(df, cx_bin_number)
 
     for i in range(cx_bin_number):
-        print("Cross Validate {}: {}".format(i, cx_bin_number+1))
+        print("{} Cross Validate {}: {}".format(airport, i, cx_bin_number+1))
         train_df, test_df = cross_validate_group(i+1, cx_val)
 
         test_df["std_regression"] = get_simple_linear_regression(test_df, train_df, 'metar_wind_spd', 'gfs_wind_spd')
         test_df["opt_regression"] = get_direction_speed_weighted_simple_linear_regression(test_df, train_df, 'metar_wind_spd', 'gfs_wind_spd', 'gfs_wind_dir', 25, 2)
+
         result = []
         for index, row in test_df.iterrows():
             element = {}
@@ -53,5 +54,5 @@ for airport in airports:
             element['opt_regression'] = row['opt_regression']
             result.append(element)
 
-        with open('/home/roz016/Dropbox/Data for Tree/Results/cx5_bin100/' + airport + '_' + '_regression_cx' + str(i) + '.json', 'w') as outfile:
+        with open('/Users/monkeybutter/Dropbox/Data for Tree/Results/cx5_bin100/' + airport + '_' + '_regression_cx' + str(i) + '.json', 'w') as outfile:
             json.dump(result, outfile)
