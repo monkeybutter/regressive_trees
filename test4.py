@@ -9,7 +9,7 @@ from util import cross_validate_splits, cross_validate_group
 import pickle
 
 #airports = ['yssy', 'egll', 'zbaa']
-airports = ['egll']
+airports = ['zbaa']
 
 metar_vars = ['metar_press', 'metar_rh', 'metar_temp', 'metar_wind_dir', 'metar_wind_spd']
 metar_types = ['linear', 'linear', 'linear', 'circular', 'linear']
@@ -22,6 +22,7 @@ for airport in airports:
     df_master['gfs_wind_dir'] = df_master['gfs_wind_dir'].apply(lambda x: round(x/10) * 10)
 
     class_vars = ['metar_wind_spd', 'metar_rh', 'metar_press', 'metar_temp']
+    #class_vars = ['metar_press', 'metar_temp']
     #class_vars = ['metar_wind_dir']
 
     for class_var in class_vars:
