@@ -97,7 +97,7 @@ class LinearSplitter(Splitter):
         # Drop NaNs and sort under pred_var values
         data.df = data.df[np.isfinite(data.df[pred_var])]
         data.df = data.df.sort([pred_var])
-        data.df.index = range(0,len(data.df))
+        data.df.index = range(0, len(data.df))
 
         best_score = 0
         best_index = None

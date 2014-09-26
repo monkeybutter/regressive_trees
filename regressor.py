@@ -160,7 +160,7 @@ def get_simple_linear_regression(test_df, train_df, y_name, x_name):
 
     params = simple_linear_regression(train_df, y_name, x_name)
 
-    return test_df.apply(lambda row: row[y_name] - (row[x_name]*params[0, 0]+params[0, 1]), axis=1)
+    return test_df.apply(lambda row: row[x_name]*params[0, 0]+params[0, 1], axis=1)
 
 
 def me_simple_linear_regression(test_df, train_df, y_name, x_name):
@@ -241,7 +241,7 @@ def get_direction_speed_weighted_simple_linear_regression(test_df, train_df, y_n
 
     for index, row in test_df.iterrows():
         params = direction_speed_weighted_simple_linear_regression(train_df, y_name, x_name, wind_dir_name, row[wind_dir_name], wind_dir_span, row[x_name], wind_spd_span)
-        row["new_col"] = row[y_name]-(row[x_name]*params[0, 0]+params[0, 1])
+        test_df.ix[index, 'new_col'] = row[x_name]*params[0, 0]+params[0, 1]
 
     return test_df["new_col"]
 
