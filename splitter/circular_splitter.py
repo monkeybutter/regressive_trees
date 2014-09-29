@@ -157,9 +157,9 @@ class CircularSplitter(Splitter):
         data.df.index = range(0,len(data.df))
 
         shifter = self._shif_data(data, pred_var)
-
+        i=0
         for shifted in shifter:
-
+            i+=1
             mid_value = mid_angle(shifted.df[pred_var].iloc[shifted.df.shape[0]-1], shifted.df[pred_var].iloc[0])
             shifted.var_limits[pred_var]['start'] = mid_value
             shifted.var_limits[pred_var]['end'] = mid_value
@@ -168,7 +168,7 @@ class CircularSplitter(Splitter):
                 best_score = score
                 best_left = left_ang_df
                 best_right = right_ang_df
-
+        print i
         return best_score, best_left, best_right
 
 

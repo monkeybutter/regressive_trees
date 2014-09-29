@@ -185,4 +185,5 @@ class Tree(object):
                     leaf['value'] = tree.right_child.value.strftime('%b %d')
                 tree_dict['children'].append(leaf)
 
-        return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")
+        return tree_dict
+        #return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")
