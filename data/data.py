@@ -44,6 +44,7 @@ class Data(object):
         self._set_class_type()
 
         for idx, variable in enumerate(df.columns):
+            #print idx, variable
             if first:
                 if var_types[idx] == 'date':
                     self.df[variable] = self.df[variable].apply(lambda d: date_to_angle(datetime.strptime(d, "%Y-%m-%d").date()))

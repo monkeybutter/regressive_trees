@@ -54,5 +54,5 @@ for airport in airports:
             element['opt_regression'] = row['opt_regression']
             result.append(element)
 
-        with open('/Users/monkeybutter/Dropbox/Data for Tree/Results/cx5_bin100/' + airport + '_' + '_regression_cx' + str(i) + '.json', 'w') as outfile:
+        with open('/Users/monkeybutter/Dropbox/Data for Tree/Results/cx5_bin100/' + airport + '_regression_cx' + str(i) + '.json', 'w') as outfile:
             json.dump(result, outfile)
