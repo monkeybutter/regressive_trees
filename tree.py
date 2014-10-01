@@ -51,6 +51,8 @@ class Tree(object):
 
         for variable, dict in data.var_limits.iteritems():
             print("+ " + variable)
+            print("+ start {}".format(data.var_limits[variable]['start']))
+            print("+ end {}".format(data.var_limits[variable]['end']))
             splitter = SplitterFactory(dict['type'], criteria)
             score, left_df, right_df = splitter.get_split_values(data, variable)
             if score > best_score:

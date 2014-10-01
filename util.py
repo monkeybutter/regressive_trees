@@ -36,12 +36,12 @@ def cross_validate_group(test_group_pos, dataframes):
     else:
         raise Exception('Group not in range!')
 
-
+"""
 def circular_distance(ang_a, ang_b):
 
     return 1-math.cos(ang_a-ang_b)
 
-
+"""
 def mid_angle(ang_a, ang_b):
     #input in Degrees [0-360]
 
@@ -78,8 +78,29 @@ def _bearing_average(df, pred_var):
 
 
 def circular_mean(data):
-    #input in Degrees [0-360]
-    return _bearing_average_in_arc(data, data.class_var)
+
+    x = y = 0.0
+    for index, row in data.df.iterrows():
+        x += math.cos(math.radians(row[data.class_var]))
+        y += math.sin(math.radians(row[data.class_var]))
+
+    value = math.degrees(math.atan2(y, x)) % 360
+
+    if contained_in_arc(data.var_limits[data.class_var]['start'], data.var_limits[data.class_var]['start'], value):
+        return value
+    else:
+        return math.degrees(math.atan2(y, x) + math.pi) % 360
+
+
+def circular_variance(data):
+
+    x = y = 0.0
+    for index, row in data.df.iterrows():
+        x += math.cos(math.radians(row[data.class_var]))
+        y += math.sin(math.radians(row[data.class_var]))
+
+    return math.sqrt(math.pow(x/data.df.shape[0], 2) + math.pow(y/data.df.shape[0], 2))
+
 
 def circular_heterogeneity(data):
     #input in Degrees [0-360]
@@ -123,12 +144,12 @@ def sort_in_arc(df, bearing_a, bearing_b, pred_var):
 
 def contained_in_arc(bearing_a, bearing_b, value):
     if bearing_a < bearing_b:
-        if value <= bearing_b and value >= bearing_a:
+        if bearing_b >= value >= bearing_a:
             return True
         else:
             return False
     else:
-        if (value <= 360 and value > bearing_a) or (value < bearing_b and value >= 0):
+        if (360 >= value > bearing_a) or (bearing_b > value >= 0):
             return True
         else:
             return False

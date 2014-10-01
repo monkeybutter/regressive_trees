@@ -2,7 +2,7 @@ __author__ = 'SmartWombat'
 
 import numpy as np
 from splitter import Splitter
-from util import mid_angle, sort_in_arc
+from util import sort_in_arc, mid_angle
 
 class CircularSplitter(Splitter):
 
@@ -84,7 +84,8 @@ class CircularSplitter(Splitter):
                 prev_val = data.df[pred_var].iloc[index]
 
         # sequence indexing is [start_pos:end_pos(excluded)]
-        return best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')
+        return best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var,
+                                                                                           'circular')
 
 
     def get_split_values_queue(self, queue, data, pred_var, type_var):
@@ -93,7 +94,8 @@ class CircularSplitter(Splitter):
             return self._first_run_queue(queue, data, pred_var, type_var)
 
         else:
-            data.df = sort_in_arc(data.df, data.var_limits[pred_var]['start'], data.var_limits[pred_var]['end'], pred_var)
+            data.df = sort_in_arc(data.df, data.var_limits[pred_var]['start'], data.var_limits[pred_var]['end'],
+                                  pred_var)
             return self._get_split_values_queue(queue, data, pred_var, type_var)
 
 
@@ -118,7 +120,8 @@ class CircularSplitter(Splitter):
 
                 prev_val = data.df[pred_var].iloc[index]
 
-        queue.put((pred_var, type_var, best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(best_index, pred_var, 'circular')))
+        queue.put((pred_var, type_var, best_score, data.get_left(best_index, pred_var, 'circular'), data.get_right(
+            best_index, pred_var, 'circular')))
         return True
 
     def _first_run_queue(self, queue, data, pred_var, type_var):
@@ -128,7 +131,7 @@ class CircularSplitter(Splitter):
 
         data.df = data.df[np.isfinite(data.df[pred_var])]
         data.df = data.df.sort([pred_var])
-        data.df.index = range(0,len(data.df))
+        data.df.index = range(0, len(data.df))
 
         shifter = self._shif_data(data, pred_var)
 
@@ -154,12 +157,11 @@ class CircularSplitter(Splitter):
 
         data.df = data.df[np.isfinite(data.df[pred_var])]
         data.df = data.df.sort([pred_var])
-        data.df.index = range(0,len(data.df))
+        data.df.index = range(0, len(data.df))
 
         shifter = self._shif_data(data, pred_var)
-        i=0
+
         for shifted in shifter:
-            i+=1
             mid_value = mid_angle(shifted.df[pred_var].iloc[shifted.df.shape[0]-1], shifted.df[pred_var].iloc[0])
             shifted.var_limits[pred_var]['start'] = mid_value
             shifted.var_limits[pred_var]['end'] = mid_value
@@ -168,7 +170,7 @@ class CircularSplitter(Splitter):
                 best_score = score
                 best_left = left_ang_df
                 best_right = right_ang_df
-        print i
+
         return best_score, best_left, best_right
 
 
