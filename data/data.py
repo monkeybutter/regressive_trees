@@ -36,7 +36,8 @@ class Data(object):
         TODO: how best to document class attributes.
         """
 
-        self.df = df
+        df_copy = copy.deepcopy(df)
+        self.df = df_copy
         self.class_var = class_var
         self.var_types = var_types
         self.var_limits = {}
@@ -58,6 +59,7 @@ class Data(object):
                 self.var_limits[variable]['type'] = var_types[idx]
                 self.var_limits[variable]['start'] = None
                 self.var_limits[variable]['end'] = None
+
 
     def _set_class_type(self):
         for idx, variable in enumerate(self.df.columns):

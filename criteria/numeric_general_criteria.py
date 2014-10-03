@@ -38,7 +38,7 @@ class BasicRegressionCriteria(Criteria):
         super(BasicRegressionCriteria, self).__init__(class_var)
 
 
-    def get_value(self, left_data, right_data):
+    def get_value(self, data, left_data, right_data):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -56,6 +56,6 @@ class BasicRegressionCriteria(Criteria):
         total_cases = left_cases + right_cases
         error_split = (left_cases/total_cases * np.var(left_data.df[self.class_var])) + (right_cases/total_cases * np.var(right_data.df[self.class_var]))
         #error_split = (left_cases/total_cases * left_data.df[self.class_var].var) + (right_cases/total_cases * right_data.df[self.class_var].var)
-        error = np.var(left_data.df.append(right_data.df)[self.class_var])
+        error = np.var(data.df[self.class_var])
 
         return error - error_split

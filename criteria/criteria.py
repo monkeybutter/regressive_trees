@@ -69,7 +69,7 @@ class Criteria(object):
         self.class_var = class_var
 
 
-    def get_value(self, left_df, right_df):
+    def get_value(self, data, left_data, right_data):
         r"""Returns a value with the average height of crop
 
         Returns

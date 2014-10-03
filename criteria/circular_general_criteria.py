@@ -2,7 +2,7 @@ __author__ = 'SmartWombat'
 
 import numpy as np
 from criteria import Criteria
-from util import circular_heterogeneity
+from util import circular_heterogeneity, circular_variance
 import sys
 
 class CircularRegressionCriteria(Criteria):
@@ -43,7 +43,7 @@ class CircularRegressionCriteria(Criteria):
         super(CircularRegressionCriteria, self).__init__(class_var)
 
 
-    def get_value(self, left_data, right_data):
+    def get_value(self, data, left_data, right_data):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -56,6 +56,15 @@ class CircularRegressionCriteria(Criteria):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
+
+        left_cases = float(left_data.df.shape[0])
+        right_cases = float(right_data.df.shape[0])
+        total_cases = left_cases + right_cases
+        var_splits = (left_cases/total_cases * circular_variance(left_data)) + (right_cases/total_cases * circular_variance(right_data))
+        #error_split = (left_cases/total_cases * left_data.df[self.class_var].var) + (right_cases/total_cases * right_data.df[self.class_var].var)
+        var_start = circular_variance(left_data.df.append(right_data.df)[self.class_var])
+
+        return var_start - var_splits
 
         left_cases = float(left_data.df.shape[0])
         right_cases = float(right_data.df.shape[0])

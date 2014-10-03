@@ -138,52 +138,52 @@ class Tree(object):
                 print('Leaf members: {}'.format(tree.right_child.members))
                 print('Value {}'.format(tree.right_child.value))
 
-    def tree_to_dict(self, tree, track):
-        tree_dict = {}
-        tree_dict['name'] = track
-        tree_dict['var_name'] = tree.split_var
-        tree_dict['var_type'] = tree.var_type
+def tree_to_dict(tree, track):
+    tree_dict = {}
+    tree_dict['name'] = track
+    tree_dict['var_name'] = tree.split_var
+    tree_dict['var_type'] = tree.var_type
+    tree_dict['var_limits'] = tree.split_values
+    if tree.var_type == 'time':
+        tree_dict['var_limits'] = angle_to_time(tree.split_values[0]).strftime("%H:%M"), angle_to_time(tree.split_values[1]).strftime("%H:%M"), angle_to_time(tree.split_values[2]).strftime("%H:%M"), angle_to_time(tree.split_values[3]).strftime("%H:%M")
+    elif tree.var_type == 'date':
+        tree_dict['var_limits'] = angle_to_date(tree.split_values[0]).strftime("%b %d"), angle_to_date(tree.split_values[1]).strftime("%b %d"), angle_to_date(tree.split_values[2]).strftime("%b %d"), angle_to_date(tree.split_values[3]).strftime("%b %d")
+    else:
         tree_dict['var_limits'] = tree.split_values
-        if tree.var_type == 'time':
-            tree_dict['var_limits'] = angle_to_time(tree.split_values[0]).strftime("%H:%M"), angle_to_time(tree.split_values[1]).strftime("%H:%M"), angle_to_time(tree.split_values[2]).strftime("%H:%M"), angle_to_time(tree.split_values[3]).strftime("%H:%M")
-        elif tree.var_type == 'date':
-            tree_dict['var_limits'] = angle_to_date(tree.split_values[0]).strftime("%b %d"), angle_to_date(tree.split_values[1]).strftime("%b %d"), angle_to_date(tree.split_values[2]).strftime("%b %d"), angle_to_date(tree.split_values[3]).strftime("%b %d")
-        else:
-            tree_dict['var_limits'] = tree.split_values
-        tree_dict['children'] = []
+    tree_dict['children'] = []
 
-        if tree.left_child != None:
-            if tree.left_child.get_name() == 'Node':
-                #tree_dict['var_name'] = tree.left_child.split_var
-                tree_dict['children'].append(self.tree_to_dict(tree.left_child, track+'L'))
-            elif tree.left_child.get_name() == 'Leaf':
-                leaf = {}
-                leaf['name'] = track+'L'
-                leaf['members'] = tree.left_child.members
-                if isinstance(tree.left_child.value, float):
-                    leaf['value'] = '{0:.2f}'.format(tree.left_child.value)
-                if isinstance(tree.left_child.value, time):
-                    leaf['value'] = tree.left_child.value.strftime('%H:%M')
-                if isinstance(tree.left_child.value, date):
-                    leaf['value'] = tree.left_child.value.strftime('%b %d')
-                tree_dict['children'].append(leaf)
+    if tree.left_child != None:
+        if tree.left_child.get_name() == 'Node':
+            #tree_dict['var_name'] = tree.left_child.split_var
+            tree_dict['children'].append(tree_to_dict(tree.left_child, track+'L'))
+        elif tree.left_child.get_name() == 'Leaf':
+            leaf = {}
+            leaf['name'] = track+'L'
+            leaf['members'] = tree.left_child.members
+            if isinstance(tree.left_child.value, float):
+                leaf['value'] = '{0:.2f}'.format(tree.left_child.value)
+            if isinstance(tree.left_child.value, time):
+                leaf['value'] = tree.left_child.value.strftime('%H:%M')
+            if isinstance(tree.left_child.value, date):
+                leaf['value'] = tree.left_child.value.strftime('%b %d')
+            tree_dict['children'].append(leaf)
 
 
-        if tree.right_child != None:
-            if tree.right_child.get_name() == 'Node':
-                #tree_dict['var_name'] = tree.right_child.split_var
-                tree_dict['children'].append(self.tree_to_dict(tree.right_child, track+'R'))
-            elif tree.right_child.get_name() == 'Leaf':
-                leaf = {}
-                leaf['name'] = track+'R'
-                leaf['members'] = tree.right_child.members
-                if isinstance(tree.right_child.value, float):
-                    leaf['value'] = '{0:.2f}'.format(tree.right_child.value)
-                if isinstance(tree.right_child.value, time):
-                    leaf['value'] = tree.right_child.value.strftime('%H:%M')
-                if isinstance(tree.right_child.value, date):
-                    leaf['value'] = tree.right_child.value.strftime('%b %d')
-                tree_dict['children'].append(leaf)
+    if tree.right_child != None:
+        if tree.right_child.get_name() == 'Node':
+            #tree_dict['var_name'] = tree.right_child.split_var
+            tree_dict['children'].append(tree_to_dict(tree.right_child, track+'R'))
+        elif tree.right_child.get_name() == 'Leaf':
+            leaf = {}
+            leaf['name'] = track+'R'
+            leaf['members'] = tree.right_child.members
+            if isinstance(tree.right_child.value, float):
+                leaf['value'] = '{0:.2f}'.format(tree.right_child.value)
+            if isinstance(tree.right_child.value, time):
+                leaf['value'] = tree.right_child.value.strftime('%H:%M')
+            if isinstance(tree.right_child.value, date):
+                leaf['value'] = tree.right_child.value.strftime('%b %d')
+            tree_dict['children'].append(leaf)
 
-        return tree_dict
-        #return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")
+    return tree_dict
+    #return json.dumps(tree_dict).replace("\"{", "{").replace("}\"", "}").replace("\\", "")

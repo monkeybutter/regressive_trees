@@ -75,7 +75,7 @@ class CircularSplitter(Splitter):
                 left_data = data.get_left(index, pred_var, 'circular')
                 right_data = data.get_right(index, pred_var, 'circular')
 
-                score = self.criteria.get_value(left_data, right_data)
+                score = self.criteria.get_value(data, left_data, right_data)
 
                 if score > best_score:
                     best_score = score
@@ -112,7 +112,7 @@ class CircularSplitter(Splitter):
                 left_data = data.get_left(index, pred_var, 'circular')
                 right_data = data.get_right(index, pred_var, 'circular')
 
-                score = self.criteria.get_value(left_data, right_data)
+                score = self.criteria.get_value(data, left_data, right_data)
 
                 if score > best_score:
                     best_score = score

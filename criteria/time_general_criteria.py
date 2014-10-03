@@ -43,7 +43,7 @@ class TimeRegressionCriteria(Criteria):
         super(TimeRegressionCriteria, self).__init__(class_var)
 
 
-    def get_value(self, left_data, right_data):
+    def get_value(self, data, left_data, right_data):
         r"""Returns a value with the average height of crop
 
         Returns

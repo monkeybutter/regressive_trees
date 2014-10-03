@@ -36,7 +36,6 @@ class Tree(object):
 
 
     def tree_grower(self, data, min_leaf):
-        print(1)
 
         criteria = CriteriaFactory(data.class_type, data.class_var)
 
@@ -50,9 +49,6 @@ class Tree(object):
         best_right = None
 
         for variable, dict in data.var_limits.iteritems():
-            print("+ " + variable)
-            print("+ start {}".format(data.var_limits[variable]['start']))
-            print("+ end {}".format(data.var_limits[variable]['end']))
             splitter = SplitterFactory(dict['type'], criteria)
             score, left_df, right_df = splitter.get_split_values(data, variable)
             if score > best_score:
@@ -62,7 +58,7 @@ class Tree(object):
                 best_left = left_df
                 best_right = right_df
 
-        print("Best var: " + best_var)
+        #print("Best var: " + best_var)
 
         node.split_var = best_var
         node.var_type = best_type

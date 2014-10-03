@@ -3,6 +3,7 @@ from datetime import datetime
 import pandas as pd
 import math
 import random
+import copy
 from datetime import date, time, timedelta
 import calendar
 
@@ -35,6 +36,10 @@ def cross_validate_group(test_group_pos, dataframes):
 
     else:
         raise Exception('Group not in range!')
+
+def evaluate_rmse(tree, ):
+    data = Data(train_df, class_var, df_types, True)
+
 
 """
 def circular_distance(ang_a, ang_b):
@@ -99,7 +104,7 @@ def circular_variance(data):
         x += math.cos(math.radians(row[data.class_var]))
         y += math.sin(math.radians(row[data.class_var]))
 
-    return math.sqrt(math.pow(x/data.df.shape[0], 2) + math.pow(y/data.df.shape[0], 2))
+    return 1 - math.sqrt(math.pow(x/data.df.shape[0], 2) + math.pow(y/data.df.shape[0], 2))
 
 
 def circular_heterogeneity(data):
@@ -153,7 +158,6 @@ def contained_in_arc(bearing_a, bearing_b, value):
             return True
         else:
             return False
-
 
 def angle_to_date(angle):
     _date = timedelta(seconds=365 * 86400.0 * angle / 360.0)

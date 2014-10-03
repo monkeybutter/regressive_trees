@@ -5,14 +5,23 @@ from math import sqrt
 from datetime import datetime
 
 
-def evaluate_dataset(class_var, tree, df):
+def evaluate_dataset_rmse(class_var, tree, df):
     acum_sq_error = 0
     total_values = df.shape[0]
     for index, row in df.iterrows():
         real_val = row[class_var]
         pred_val = _evaluate_value(tree, row)
-        acum_sq_error += (real_val - pred_val)**2
+        acum_sq_error += (pred_val - real_val)**2
     return sqrt(acum_sq_error/total_values)
+
+def evaluate_dataset_mae(class_var, tree, df):
+    acum_error = 0
+    total_values = df.shape[0]
+    for index, row in df.iterrows():
+        real_val = row[class_var]
+        pred_val = _evaluate_value(tree, row)
+        acum_error += (pred_val - real_val)
+    return acum_error/total_values
 
 # Error: metar - gfs
 def raw_evaluate_dataset(class_var, tree, df):
@@ -83,6 +92,7 @@ def _evaluate_value(tree, data_row):
                 raise Exception
 
         elif tree.var_type == 'date':
+            #print("split_var: " + tree.split_var)
             value = date_to_angle(datetime.strptime(data_row[tree.split_var], "%Y-%m-%d").date())
             if contained_in_arc(tree.split_values[0], tree.split_values[1], value):
                 return _evaluate_value(tree.left_child, data_row)
