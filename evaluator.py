@@ -23,8 +23,8 @@ def evaluate_dataset_mae(class_var, tree, df):
         acum_error += (pred_val - real_val)
     return acum_error/total_values
 
-# Error: metar - gfs
-def raw_evaluate_dataset(class_var, tree, df):
+# Error: metar - tree(gfs)
+def evaluate_dataset_raw(class_var, tree, df):
     result = []
     for index, row in df.iterrows():
         result.append(row[class_var] - _evaluate_value(tree, row))

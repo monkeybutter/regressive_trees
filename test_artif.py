@@ -14,8 +14,8 @@ df_cir = df.drop(['Unnamed: 0', 'time_of_day', 'day_of_year'], axis=1)
 df_lin = df.drop(['Unnamed: 0', 'time', 'date'], axis=1)
 
 
-bins = [5000]#, 2000, 1000, 500, 100, 50]
-"""
+bins = [8000]#, 2000, 1000, 500, 100, 50]
+
 for bin in bins:
     print bin
     var_types = ['linear', 'linear', 'linear']
@@ -32,7 +32,6 @@ for bin in bins:
     with open('./web/static/data/artif_cir_{}.pick'.format(bin), 'w') as f:
         pickle.dump(node, f)
 
-"""
 
 for bin in bins:
     lin_tree = pickle.load(open('./web/static/data/artif_lin_{}.pick'.format(bin), "rb" ))
