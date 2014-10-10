@@ -1,9 +1,7 @@
 __author__ = 'SmartWombat'
 
-import numpy as np
 from criteria import Criteria
-from util import circular_heterogeneity
-import sys
+from util import circular_variance
 
 class DateRegressionCriteria(Criteria):
 
@@ -60,9 +58,19 @@ class DateRegressionCriteria(Criteria):
         left_cases = float(left_data.df.shape[0])
         right_cases = float(right_data.df.shape[0])
         total_cases = left_cases + right_cases
+        var_splits = (left_cases/total_cases * circular_variance(left_data)) + (right_cases/total_cases * circular_variance(right_data))
+        var_start = circular_variance(data)
+
+        return var_start - var_splits
+
+        """
+        left_cases = float(left_data.df.shape[0])
+        right_cases = float(right_data.df.shape[0])
+        total_cases = left_cases + right_cases
         heterogeneity = (left_cases/total_cases * circular_heterogeneity(left_data)) + (right_cases/total_cases * circular_heterogeneity(right_data))
 
         if heterogeneity == 0.0:
             return sys.float_info.max
         else:
             return 1.0/heterogeneity
+        """

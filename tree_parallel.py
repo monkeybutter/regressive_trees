@@ -4,7 +4,7 @@ import numpy as np
 import json
 from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
-from util import angle_to_time, angle_to_date, circular_mean
+from util import angle_to_time, angle_to_date, circular_mean2
 from datetime import date, time
 from multiprocessing import Process, Manager
 
@@ -101,15 +101,15 @@ class Tree(object):
         if data.class_type == 'linear':
             return np.mean(data.df[data.class_var])
         elif data.class_type == 'circular':
-            return circular_mean(data)
+            return circular_mean2(data)
         elif data.class_type == 'date':
-            print circular_mean(data)
-            print angle_to_date(circular_mean(data))
-            return angle_to_date(circular_mean(data))
+            print circular_mean2(data)
+            print angle_to_date(circular_mean2(data))
+            return angle_to_date(circular_mean2(data))
         elif data.class_type == 'time':
-            print circular_mean(data)
-            print angle_to_time(circular_mean(data))
-            return angle_to_time(circular_mean(data))
+            print circular_mean2(data)
+            print angle_to_time(circular_mean2(data))
+            return angle_to_time(circular_mean2(data))
         else:
             raise Exception
 

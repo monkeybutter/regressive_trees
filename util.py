@@ -6,6 +6,7 @@ import random
 import copy
 from datetime import date, time, timedelta
 import calendar
+import numpy as np
 
 
 def cross_validate_splits(df, groups):
@@ -84,10 +85,8 @@ def _bearing_average(df, pred_var):
 
 def circular_mean(data):
 
-    x = y = 0.0
-    for index, row in data.df.iterrows():
-        x += math.cos(math.radians(row[data.class_var]))
-        y += math.sin(math.radians(row[data.class_var]))
+    x = np.sum(np.cos(np.radians(data.df[data.class_var])))
+    y = np.sum(np.sin(np.radians(data.df[data.class_var])))
 
     value = math.degrees(math.atan2(y, x)) % 360
 
@@ -96,13 +95,19 @@ def circular_mean(data):
     else:
         return math.degrees(math.atan2(y, x) + math.pi) % 360
 
+def circular_mean2(data):
+
+    x = np.sum(np.cos(np.radians(data.df[data.class_var])))
+    y = np.sum(np.sin(np.radians(data.df[data.class_var])))
+
+    return math.degrees(math.atan2(y, x)) % 360
+
+
 
 def circular_variance(data):
 
-    x = y = 0.0
-    for index, row in data.df.iterrows():
-        x += math.cos(math.radians(row[data.class_var]))
-        y += math.sin(math.radians(row[data.class_var]))
+    x = np.sum(np.cos(np.radians(data.df[data.class_var])))
+    y = np.sum(np.sin(np.radians(data.df[data.class_var])))
 
     return 1 - math.sqrt(math.pow(x/data.df.shape[0], 2) + math.pow(y/data.df.shape[0], 2))
 
@@ -168,12 +173,12 @@ def angle_to_date(angle):
 def date_to_angle(a_date):
     # Limit time values to 36
     if calendar.isleap(a_date.year):
-        return 360.0*(a_date.timetuple().tm_yday-1)/366.0
-        #return 10.0*int(a_date.timetuple().tm_yday/10.0)
+        #return 360.0*(a_date.timetuple().tm_yday-1)/366.0
+        return 10*int(a_date.timetuple().tm_yday/10.0)
 
     else:
-        return 360.0*(a_date.timetuple().tm_yday-1)/365.0
-        #return 10.0*int(a_date.timetuple().tm_yday/10.0)
+        #return 360.0*(a_date.timetuple().tm_yday-1)/365.0
+        return 10*int(a_date.timetuple().tm_yday/10.0)
 
 
 

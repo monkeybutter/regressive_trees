@@ -61,11 +61,11 @@ class CircularRegressionCriteria(Criteria):
         right_cases = float(right_data.df.shape[0])
         total_cases = left_cases + right_cases
         var_splits = (left_cases/total_cases * circular_variance(left_data)) + (right_cases/total_cases * circular_variance(right_data))
-        #error_split = (left_cases/total_cases * left_data.df[self.class_var].var) + (right_cases/total_cases * right_data.df[self.class_var].var)
-        var_start = circular_variance(left_data.df.append(right_data.df)[self.class_var])
+        var_start = circular_variance(data)
 
         return var_start - var_splits
 
+        """
         left_cases = float(left_data.df.shape[0])
         right_cases = float(right_data.df.shape[0])
         total_cases = left_cases + right_cases
@@ -75,3 +75,4 @@ class CircularRegressionCriteria(Criteria):
             return sys.float_info.max
         else:
             return 1.0/heterogeneity
+        """
