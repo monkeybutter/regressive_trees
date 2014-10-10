@@ -30,6 +30,14 @@ def evaluate_dataset_raw(class_var, tree, df):
         result.append(row[class_var] - _evaluate_value(tree, row))
     return result
 
+# Error: metar - gfs
+def evaluate_dataset_raw_no_tree(class_var, gfs_var, df):
+    result = []
+    for index, row in df.iterrows():
+        result.append(row[class_var] - row[gfs_var])
+    return result
+
+
 # detail metar - gfs
 def detail_evaluate_dataset(gfs_var, class_var, tree, df):
     result = []
