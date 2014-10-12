@@ -1,6 +1,7 @@
 __author__ = 'roz016'
 
 import numpy as np
+from sklearn import linear_model
 import math
 
 
@@ -160,7 +161,29 @@ def get_simple_linear_regression(test_df, train_df, y_name, x_name):
 
     params = simple_linear_regression(train_df, y_name, x_name)
 
-    return test_df.apply(lambda row: row[x_name]*params[0, 0]+params[0, 1], axis=1)
+    return test_df.apply(lambda row: row[y_name]-row[x_name]*params[0, 0]+params[0, 1], axis=1)
+
+
+def get_simple_linear_regression2(test_df, train_df, y_name, x_name):
+
+    # Create linear regression object
+    regr = linear_model.LinearRegression()
+
+    # Train the model using the training sets
+    regr.fit(train_df[[x_name]].values, train_df[y_name].values)
+
+    return np.add(test_df[y_name].values, (-1 * regr.predict(test_df[[x_name]].values)))
+
+
+def get_multilinear_regression(test_df, train_df, y_name, x_name):
+
+    # Create linear regression object
+    regr = linear_model.LinearRegression()
+
+    # Train the model using the training sets
+    regr.fit(train_df[x_name].values, train_df[y_name].values)
+
+    return np.add(test_df[y_name].values, (-1 * regr.predict(test_df[x_name].values)))
 
 
 def me_simple_linear_regression(test_df, train_df, y_name, x_name):
