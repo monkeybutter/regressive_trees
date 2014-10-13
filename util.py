@@ -26,7 +26,8 @@ def cross_validate_splits(df, groups):
 
 
 def cross_validate_group(test_group_pos, dataframes):
-    dataframes_copy = dataframes[:]
+    dataframes_copy = copy.deepcopy(dataframes)
+
     if 0 < test_group_pos <= len(dataframes):
 
         test_df = dataframes_copy[test_group_pos-1]
@@ -37,6 +38,7 @@ def cross_validate_group(test_group_pos, dataframes):
 
     else:
         raise Exception('Group not in range!')
+
 
 def evaluate_rmse(tree, ):
     data = Data(train_df, class_var, df_types, True)
