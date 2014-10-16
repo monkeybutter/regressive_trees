@@ -4,7 +4,7 @@ import numpy as np
 import json
 from splitter_factory import SplitterFactory
 from criteria_factory import CriteriaFactory
-from util import angle_to_time, angle_to_date, circular_mean2
+from util import angle_to_time, angle_to_date, circular_mean2, circular_mean
 from datetime import date, time
 from multiprocessing import Process, Manager
 
@@ -62,7 +62,8 @@ class Tree(object):
 
         for _ in processes:
             variable, type_var, score, left_df, right_df = queue.get()
-            if score > best_score:
+
+            if score >= best_score:
                 best_var = variable
                 best_type = type_var
                 best_score = score

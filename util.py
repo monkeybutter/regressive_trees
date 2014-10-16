@@ -84,6 +84,10 @@ def _bearing_average(df, pred_var):
     else:
         return avg
 
+# Very cool function to calculate angular distance
+def angular_distance(a, b):
+    return (a-b) % 360 if (a-b) % 360 < 180 else 360 - (a-b) % 360
+
 
 def circular_mean(data):
 

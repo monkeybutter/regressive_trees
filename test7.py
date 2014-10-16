@@ -34,12 +34,12 @@ for airport in airports:
         print("linear")
         data_lin = Data(train_df_lin, class_var, lin_types, True)
         tree = Tree()
-        node_lin = tree.tree_grower(data_lin, 100)
+        node_lin = tree.tree_grower(data_lin, 1000)
         print("circular")
         data_cir = Data(train_df_cir, class_var, cir_types, True)
         tree = Tree()
-        node_cir = tree.tree_grower(data_cir, 100)
+        node_cir = tree.tree_grower(data_cir, 1000)
 
-        print("RMSE Linear {}: {}\n".format(i+1, evaluate_dataset_rmse(class_var, node_lin, test_df_lin)))
-        print("RMSE Circular {}: {}\n".format(i+1, evaluate_dataset_rmse(class_var, node_cir, test_df_cir)))
+        print("RMSE Linear {}: {}\n".format(i+1, evaluate_dataset_rmse(class_var, 'linear', node_lin, test_df_lin)))
+        print("RMSE Circular {}: {}\n".format(i+1, evaluate_dataset_rmse(class_var, 'circular', node_cir, test_df_cir)))
 

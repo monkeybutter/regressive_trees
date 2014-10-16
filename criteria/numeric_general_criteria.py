@@ -51,9 +51,11 @@ class BasicRegressionCriteria(Criteria):
         NotImplementedError
             If the function hasn't been implemented yet.
         """
+
         left_cases = float(left_data.df.shape[0])
         right_cases = float(right_data.df.shape[0])
         total_cases = left_cases + right_cases
+
         error_split = (left_cases/total_cases * np.var(left_data.df[self.class_var])) + (right_cases/total_cases * np.var(right_data.df[self.class_var]))
         #error_split = (left_cases/total_cases * left_data.df[self.class_var].var) + (right_cases/total_cases * right_data.df[self.class_var].var)
         error = np.var(data.df[self.class_var])

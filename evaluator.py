@@ -1,18 +1,29 @@
 __author__ = 'SmartWombat'
 
-from util import time_to_angle, date_to_angle, contained_in_arc
+from util import time_to_angle, date_to_angle, contained_in_arc, angular_distance
 from math import sqrt
 from datetime import datetime
 
 
-def evaluate_dataset_rmse(class_var, tree, df):
-    acum_sq_error = 0
-    total_values = df.shape[0]
-    for index, row in df.iterrows():
-        real_val = row[class_var]
-        pred_val = _evaluate_value(tree, row)
-        acum_sq_error += (pred_val - real_val)**2
-    return sqrt(acum_sq_error/total_values)
+def evaluate_dataset_rmse(class_var, type, tree, df):
+
+    if type == 'linear':
+        acum_sq_error = 0
+        total_values = df.shape[0]
+        for index, row in df.iterrows():
+            real_val = row[class_var]
+            pred_val = _evaluate_value(tree, row)
+            acum_sq_error += (pred_val - real_val)**2
+        return sqrt(acum_sq_error/total_values)
+
+    elif type == 'circular':
+        acum_sq_error = 0
+        total_values = df.shape[0]
+        for index, row in df.iterrows():
+            real_val = row[class_var]
+            pred_val = _evaluate_value(tree, row)
+            acum_sq_error += angular_distance(pred_val, real_val)**2
+        return sqrt(acum_sq_error/total_values)
 
 def evaluate_dataset_mae(class_var, tree, df):
     acum_error = 0
