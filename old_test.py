@@ -1,7 +1,7 @@
 __author__ = 'SmartWombat'
 
 import pandas as pd
-from tree_parallel import Tree
+from tree_parallel import Tree, tree_to_dict
 from data.data import Data
 import math
 
@@ -20,12 +20,17 @@ def evaluate_dataset(node, df):
                 raise Exception
 
         if atree.get_name() == 'Leaf':
+            print atree.members
+            print atree.value
             return atree.value
 
     tree_sq_err = 0
     raw_sq_err = 0
     total_values = df.shape[0]
     for _, row in df.iterrows():
+        print "_______________________"
+        print row["gfs_wind_spd"]
+        print row[class_var]
         pred_val = _evaluate_value(node, row)
         raw_sq_err += (row["gfs_wind_spd"] - row[class_var])**2
         tree_sq_err += (pred_val - row[class_var])**2
@@ -34,7 +39,7 @@ def evaluate_dataset(node, df):
 if __name__ == "__main__":
 
     airports = ['yssy', 'egll', 'zbaa']
-    airports = ['yssy']
+    airports = ['zbaa']
 
     for airport in airports:
         df = pd.read_csv("./web/static/data/" + airport + ".csv")
@@ -47,11 +52,13 @@ if __name__ == "__main__":
         df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x/0.5))
 
         class_var = 'metar_wind_spd'
-        var_types = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear']
+        var_types = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear']
 
         data = Data(df, class_var, var_types, True)
         tree = Tree()
-        node = tree.tree_grower(data, 3200)
+        node = tree.tree_grower(data, 100)
+
+        print tree_to_dict(node, "O")
 
         print evaluate_dataset(node, df)
 
