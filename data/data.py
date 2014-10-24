@@ -36,8 +36,7 @@ class Data(object):
         TODO: how best to document class attributes.
         """
 
-        df_copy = copy.deepcopy(df)
-        self.df = df_copy
+        self.df = copy.deepcopy(df)
         self.class_var = class_var
         self.var_types = var_types
         self.var_limits = {}

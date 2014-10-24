@@ -25,7 +25,7 @@ tree = Tree()
 node_cir = tree.tree_grower(data_cir, 200)
 
 
-print("RMSE Linear: {}".format(evaluate_dataset_rmse('dir', 'linear', node_lin, test_df_lin)))
+print("RMSE Linear: {}".format(evaluate_dataset_rmse('dir', 'circular', node_lin, test_df_lin)))
 print("RMSE Circular: {}".format(evaluate_dataset_rmse('dir', 'circular', node_cir, test_df_cir)))
 
 print(tree_to_dict(node_lin, "O"))

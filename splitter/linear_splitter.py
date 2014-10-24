@@ -80,7 +80,7 @@ class LinearSplitter(Splitter):
         return best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')
 
 
-    def get_split_values_queue(self, queue, data, pred_var, type_var):
+    def get_split_values_queue(self, queue, data, split_var, type_var):
         r"""Returns a value with the average height of crop
 
         Returns
@@ -95,30 +95,32 @@ class LinearSplitter(Splitter):
         """
         #TODO Filter before calling tree
         # Drop NaNs and sort under pred_var values
-        data.df = data.df[np.isfinite(data.df[pred_var])]
-        data.df = data.df.sort([pred_var])
+
+
+        data.df = data.df[np.isfinite(data.df[split_var])]
+        data.df = data.df.sort([split_var])
         data.df.index = range(0, len(data.df))
 
         best_score = 0
         best_index = None
 
-        prev_val = data.df[pred_var].iloc[1]
+        prev_val = data.df[split_var].iloc[1]
 
         for index in range(1, data.df.shape[0]-1):
-            if prev_val != data.df[pred_var].iloc[index]:
+            if prev_val != data.df[split_var].iloc[index]:
 
-                left_data = data.get_left(index, pred_var, 'linear')
-                right_data = data.get_right(index, pred_var, 'linear')
+                left_data = data.get_left(index, split_var, 'linear')
+                right_data = data.get_right(index, split_var, 'linear')
 
                 score = self.criteria.get_value(data, left_data, right_data)
 
-                if score > best_score:
+                if score >= best_score:
                     best_score = score
                     best_index = index
 
-                prev_val = data.df[pred_var].iloc[index]
+                prev_val = data.df[split_var].iloc[index]
 
         # sequence indexing is [start_pos:end_pos(excluded)]
 
-        queue.put((pred_var, type_var, best_score, data.get_left(best_index, pred_var, 'linear'), data.get_right(best_index, pred_var, 'linear')))
+        queue.put((split_var, type_var, best_score, data.get_left(best_index, split_var, 'linear'), data.get_right(best_index, split_var, 'linear')))
         return True
