@@ -26,9 +26,8 @@ def circular_criteria(master_data, split_var):
 
     if data.var_limits[split_var] == (float("-inf"), float("inf")):
 
-        def f(L):
-            """Return indices of the first minimum value in a list of lists."""
-            return min(min(e) for e in L), min((n, i, j) for i, L2 in enumerate(L) for j, n in enumerate(L2))[1:]
+        def min_indices(list_of_lists):
+            return min((value, (i, j)) for i, inner_list in enumerate(list_of_lists) for j, value in enumerate(inner_list))
 
         data.df = data.df.sort([split_var])
         values, indices = np.unique(data.df[split_var], return_index=True)
@@ -40,49 +39,26 @@ def circular_criteria(master_data, split_var):
                        for indice in indices]
         dfs = [copy.deepcopy(data.df).iloc[index:].append(copy.deepcopy(data.df).iloc[:index]) for index in indices]
 
-        print [[(idx / data.df.shape[0] * np.var(dfs[index][data.class_var].iloc[:idx])) + (
-        (data.df.shape[0] - idx) / data.df.shape[0] * np.var(dfs[index][data.class_var].iloc[idx:]))
-                               for idx in index_list[1:]] for (index, index_list) in enumerate(index_lists)]
-
-        score, min_index = f([[(idx / data.df.shape[0] * np.var(dfs[index][data.class_var].iloc[:idx])) + (
-        (data.df.shape[0] - idx) / data.df.shape[0] * np.var(dfs[index][data.class_var].iloc[idx:]))
+        score, min_index = min_indices([[(idx / data.df.shape[0] * np.var(dfs[index][data.class_var].iloc[:idx])) + (
+            (data.df.shape[0] - idx) / data.df.shape[0] * np.var(dfs[index][data.class_var].iloc[idx:]))
                                for idx in index_list[1:]] for (index, index_list) in enumerate(index_lists)])
 
         return_df_uncut = dfs[min_index[0]]
         return_indexes_uncut = index_lists[min_index[0]]
 
-        print return_df_uncut
-        print return_indexes_uncut
-
         left_data = Data(dfs[min_index[0]].iloc[:return_indexes_uncut[min_index[1] + 1]], copy.deepcopy(data.class_var),
                          copy.deepcopy(data.var_types), copy.deepcopy(data.var_limits))
-        right_data = Data(dfs[min_index[0]].iloc[return_indexes_uncut[min_index[1] + 1]:],
-                          copy.deepcopy(data.class_var), copy.deepcopy(data.var_types), copy.deepcopy(data.var_limits))
+        right_data = Data(dfs[min_index[0]].iloc[return_indexes_uncut[min_index[1] + 1]:], copy.deepcopy(data.class_var),
+                          copy.deepcopy(data.var_types), copy.deepcopy(data.var_limits))
 
-        left_data.var_limits[split_var] = (dfs[min_index[0]][split_var].iloc[0], dfs[min_index[0]][split_var].iloc[
-            index_lists[min_index[0]][min_index[1] + 1]])
-        right_data.var_limits[split_var] = (
-        dfs[min_index[0]][split_var].iloc[index_lists[min_index[0]][min_index[1] + 1]],
-        dfs[min_index[0]][split_var].iloc[0])
-
-        print("*******1********")
-        print left_data.var_limits[split_var]
-        print right_data.var_limits[split_var]
-
-        values, indices = np.unique(left_data.df[split_var], return_index=True)
-        print values
-
-        values, indices = np.unique(right_data.df[split_var], return_index=True)
-        print values
-        print("*******1********")
+        left_data.var_limits[split_var] = (dfs[min_index[0]][split_var].iloc[0],
+                                           dfs[min_index[0]][split_var].iloc[index_lists[min_index[0]][min_index[1] + 1]])
+        right_data.var_limits[split_var] = (dfs[min_index[0]][split_var].iloc[index_lists[min_index[0]][min_index[1] + 1]],
+                                            dfs[min_index[0]][split_var].iloc[0])
 
         return score, left_data, right_data
 
     else:
-        print("*******2********")
-        print data.var_limits[split_var]
-        print data.var_limits[split_var]
-        print("*******2********")
 
         data.df = data.df.sort([split_var])
         # If dataset crosses origin, it has to be reordered
@@ -109,7 +85,7 @@ def splitter(data, split_var):
         return float("inf"), None, None
 
     scores = [(idx / data.df.shape[0] * np.var(data.df[data.class_var].iloc[:idx])) + (
-    (data.df.shape[0] - idx) / data.df.shape[0] * np.var(data.df[data.class_var].iloc[idx:])) for idx in indices[1:]]
+        (data.df.shape[0] - idx) / data.df.shape[0] * np.var(data.df[data.class_var].iloc[idx:])) for idx in indices[1:]]
 
     left_data = Data(copy.deepcopy(data.df.iloc[:indices[np.argmin(scores) + 1]]), copy.deepcopy(data.class_var),
                      copy.deepcopy(data.var_types), copy.deepcopy(data.var_limits))
@@ -127,10 +103,10 @@ class Node(object):
     __class_description__ = """Abstract class for a binary tree node"""
     __version__ = 0.1
 
-    def __init__(self, data):
+    def __init__(self, node_data):
 
         self.split_var = None
-        self.data = data
+        self.data = node_data
         self.left_child = None
         self.right_child = None
 
@@ -161,33 +137,14 @@ class Node(object):
                 else:
                     pass
 
-        if self.split_var == 'gfs_wind_dir':
-            print("Wind dir selected!")
-            print(best_left.var_limits['gfs_wind_dir'])
-            print(best_right.var_limits['gfs_wind_dir'])
-
-        #print best_score
+        # print best_score
         self.left_child = Node(best_left)
         self.right_child = Node(best_right)
 
 
-def tree_grower(data, min_leaf):
-    node = Node(data)
+def tree_grower(tree_data, min_leaf):
+    node = Node(tree_data)
     node.split()
-    """
-    print(node.split_var)
-    print(node.data.df.shape[0])
-    print(node.data.var_limits)
-    print("Left {}".format(node.left_child.data.var_limits))
-    print("Left count {}".format(node.left_child.data.df.shape))
-    print("Left mean {}".format(node.left_child.data.df[data.class_var].mean()))
-    print("Left branch values {}".format(np.unique(node.left_child.data.df[node.split_var])))
-
-    print("Right {}".format(node.right_child.data.var_limits))
-    print("Right count {}".format(node.right_child.data.df.shape))
-    print("Right mean {}".format(node.right_child.data.df[data.class_var].mean()))
-    print("Right branch values {}".format(np.unique(node.right_child.data.df[node.split_var])))
-    """
 
     if node.left_child.data.df.shape[0] > min_leaf:
         node.left_child = tree_grower(node.left_child.data, min_leaf)
@@ -198,7 +155,7 @@ def tree_grower(data, min_leaf):
     return node
 
 
-def evaluate_dataset(node, df):
+def evaluate_dataset(node, df_to_eval):
     def _evaluate_value(anode, data_row):
         if anode.split_var is not None:
             if anode.left_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] < \
@@ -207,17 +164,12 @@ def evaluate_dataset(node, df):
             else:
                 return _evaluate_value(anode.right_child, data_row)
         else:
-            #print anode.data.df.shape[0]
-            #print anode.data.df[anode.data.class_var].mean()
             return anode.data.df[anode.data.class_var].mean()
 
     tree_sq_err = 0
     raw_sq_err = 0
-    total_values = df.shape[0]
-    for _, row in df.iterrows():
-        #print "_______________________"
-        #print row["gfs_wind_spd"]
-        #print row[class_var]
+    total_values = df_to_eval.shape[0]
+    for _, row in df_to_eval.iterrows():
         pred_val = _evaluate_value(node, row)
         raw_sq_err += (row["gfs_wind_spd"] - row[class_var]) ** 2
         tree_sq_err += (pred_val - row[class_var]) ** 2
@@ -226,6 +178,25 @@ def evaluate_dataset(node, df):
 
 if __name__ == "__main__":
 
+    from datetime import datetime
+    import calendar
+
+    def time_to_angle(a_time):
+        #return 360.0*(a_time.hour*3600+a_time.minute*60+a_time.second)/86400.0
+        # Limit time values to 24
+        return 360.0*a_time.hour/24.0
+
+    def date_to_angle(a_date):
+        # Limit time values to 36
+        if calendar.isleap(a_date.year):
+            #return 360.0*(a_date.timetuple().tm_yday-1)/366.0
+            return 10*int(a_date.timetuple().tm_yday/10.0)
+
+        else:
+            #return 360.0*(a_date.timetuple().tm_yday-1)/365.0
+            return 10*int(a_date.timetuple().tm_yday/10.0)
+
+    """
     df = pd.read_csv("/home/roz016/Dropbox/Data for Tree/New Tree/test.csv")
     df.drop([u'Unnamed: 0'], axis=1, inplace=True)
 
@@ -242,35 +213,52 @@ if __name__ == "__main__":
 
     """
     airports = ['yssy', 'egll', 'zbaa']
-    airports = ['egll']
 
     for airport in airports:
         print airport
 
-        var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear']
-        var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear']
+        var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
+        var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
 
         var_types_list = [var_types_linear, var_types_circular]
 
-        for var_types in var_types_list:
+        bins = [2000, 1000, 500, 200, 100]
+        for bin_size in bins:
+            print bin_size
 
-            df = pd.read_csv("./web/static/data/" + airport + ".csv")
-            df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'time', u'date'], axis=1, inplace=True)
+            for var_types in var_types_list:
 
-            df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
-            df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
-            df['gfs_rh'] = df['gfs_rh'].apply(lambda x: round(x))
-            df['gfs_temp'] = df['gfs_temp'].apply(lambda x: round(x))
-            df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
+                df = pd.read_csv("./web/static/data/" + airport + ".csv")
+                df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir'], axis=1, inplace=True)
 
-            #print df.shape
+                df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
+                df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
+                df['gfs_rh'] = df['gfs_rh'].apply(lambda x: round(x))
+                df['gfs_temp'] = df['gfs_temp'].apply(lambda x: round(x))
+                df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
 
-            class_var = 'metar_wind_spd'
+                df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
+                df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
 
-            data = Data(df, class_var, var_types)
+                df2 = pd.read_csv("./web/static/data/" + airport + ".csv")
+                df2.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'date', u'time'], axis=1, inplace=True)
 
-            new_tree = tree_grower(data, 600)
+                df2['gfs_wind_dir'] = df2['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
+                df2['gfs_press'] = df2['gfs_press'].apply(lambda x: round(x))
+                df2['gfs_rh'] = df2['gfs_rh'].apply(lambda x: round(x))
+                df2['gfs_temp'] = df2['gfs_temp'].apply(lambda x: round(x))
+                df2['gfs_wind_spd'] = df2['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
 
-            print var_types
-            print evaluate_dataset(new_tree, df)
-    """
+                class_var = 'metar_wind_spd'
+
+                print("Full Columns")
+                data = Data(df, class_var, var_types)
+                new_tree = tree_grower(data, bin_size)
+                print var_types
+                print evaluate_dataset(new_tree, df)
+
+                print("Reduced Columns")
+                data = Data(df2, class_var, var_types)
+                new_tree = tree_grower(data, bin_size)
+                print var_types
+                print evaluate_dataset(new_tree, df2)
