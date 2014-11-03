@@ -81,6 +81,10 @@ def linear_criteria(master_data, split_var):
 def splitter(data, split_var):
     values, indices = np.unique(data.df[split_var], return_index=True)
 
+     # In case indices are not ordered we need to sort both to leave 0 index at position 0
+    values = [val for (ind, val) in sorted(zip(indices, values))]
+    indices = sorted(indices)
+
     if len(indices) == 1:
         return float("inf"), None, None
 
@@ -156,24 +160,43 @@ def tree_grower(tree_data, min_leaf):
 
 
 def evaluate_dataset(node, df_to_eval):
+
     def _evaluate_value(anode, data_row):
         if anode.split_var is not None:
-            if anode.left_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] < \
-                    anode.left_child.data.var_limits[anode.split_var][1]:
-                return _evaluate_value(anode.left_child, data_row)
+
+            #try on left limits
+            if anode.left_child.data.var_limits[anode.split_var][0] > anode.left_child.data.var_limits[anode.split_var][1]:
+                if anode.left_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] <= 360 or \
+                        0 <= data_row[anode.split_var] < anode.left_child.data.var_limits[anode.split_var][1]:
+                    #print("is in left limits: {}".format(anode.left_child.data.var_limits[anode.split_var]))
+                    return _evaluate_value(anode.left_child, data_row)
             else:
-                return _evaluate_value(anode.right_child, data_row)
+                if anode.left_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] < \
+                        anode.left_child.data.var_limits[anode.split_var][1]:
+                    #print("is in left limits2: {}".format(anode.left_child.data.var_limits[anode.split_var]))
+                    return _evaluate_value(anode.left_child, data_row)
+
+            #try on right limits
+            if anode.right_child.data.var_limits[anode.split_var][0] > anode.right_child.data.var_limits[anode.split_var][1]:
+                if anode.right_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] <= 360 or \
+                        0 <= data_row[anode.split_var] < anode.right_child.data.var_limits[anode.split_var][1]:
+                    #print("is in right limits: {}".format(anode.right_child.data.var_limits[anode.split_var]))
+                    return _evaluate_value(anode.right_child, data_row)
+            else:
+                if anode.right_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] < \
+                        anode.right_child.data.var_limits[anode.split_var][1]:
+                    #print("is in right limits2: {}".format(anode.right_child.data.var_limits[anode.split_var]))
+                    return _evaluate_value(anode.right_child, data_row)
         else:
+            #print anode.data.df
             return anode.data.df[anode.data.class_var].mean()
 
     tree_sq_err = 0
-    raw_sq_err = 0
     total_values = df_to_eval.shape[0]
     for _, row in df_to_eval.iterrows():
         pred_val = _evaluate_value(node, row)
-        raw_sq_err += (row["gfs_wind_spd"] - row[class_var]) ** 2
-        tree_sq_err += (pred_val - row[class_var]) ** 2
-    return math.sqrt(raw_sq_err / total_values), math.sqrt(tree_sq_err / total_values)
+        tree_sq_err += (pred_val - row[node.data.class_var]) ** 2
+    return math.sqrt(tree_sq_err / total_values)
 
 
 if __name__ == "__main__":
