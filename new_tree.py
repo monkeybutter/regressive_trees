@@ -159,44 +159,196 @@ def tree_grower(tree_data, min_leaf):
     return node
 
 
-def evaluate_dataset(node, df_to_eval):
+"""*************************
+*********Evaluation*********
+*************************"""
 
-    def _evaluate_value(anode, data_row):
+def evaluate_value_mean(anode, data_row):
         if anode.split_var is not None:
 
             #try on left limits
             if anode.left_child.data.var_limits[anode.split_var][0] > anode.left_child.data.var_limits[anode.split_var][1]:
                 if anode.left_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] <= 360 or \
                         0 <= data_row[anode.split_var] < anode.left_child.data.var_limits[anode.split_var][1]:
-                    #print("is in left limits: {}".format(anode.left_child.data.var_limits[anode.split_var]))
-                    return _evaluate_value(anode.left_child, data_row)
+
+                    return evaluate_value_mean(anode.left_child, data_row)
             else:
                 if anode.left_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] < \
                         anode.left_child.data.var_limits[anode.split_var][1]:
-                    #print("is in left limits2: {}".format(anode.left_child.data.var_limits[anode.split_var]))
-                    return _evaluate_value(anode.left_child, data_row)
+
+                    return evaluate_value_mean(anode.left_child, data_row)
 
             #try on right limits
             if anode.right_child.data.var_limits[anode.split_var][0] > anode.right_child.data.var_limits[anode.split_var][1]:
                 if anode.right_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] <= 360 or \
                         0 <= data_row[anode.split_var] < anode.right_child.data.var_limits[anode.split_var][1]:
-                    #print("is in right limits: {}".format(anode.right_child.data.var_limits[anode.split_var]))
-                    return _evaluate_value(anode.right_child, data_row)
+
+                    return evaluate_value_mean(anode.right_child, data_row)
             else:
                 if anode.right_child.data.var_limits[anode.split_var][0] <= data_row[anode.split_var] < \
                         anode.right_child.data.var_limits[anode.split_var][1]:
-                    #print("is in right limits2: {}".format(anode.right_child.data.var_limits[anode.split_var]))
-                    return _evaluate_value(anode.right_child, data_row)
+
+                    return evaluate_value_mean(anode.right_child, data_row)
         else:
             #print anode.data.df
             return anode.data.df[anode.data.class_var].mean()
 
-    tree_sq_err = 0
-    total_values = df_to_eval.shape[0]
+
+def evaluate_dataset_rmse(node, df_to_eval):
+
+    err = 0
+    n = df_to_eval.shape[0]
     for _, row in df_to_eval.iterrows():
-        pred_val = _evaluate_value(node, row)
-        tree_sq_err += (pred_val - row[node.data.class_var]) ** 2
-    return math.sqrt(tree_sq_err / total_values)
+        pred_val = evaluate_value_mean(node, row)
+        err += (pred_val - row[node.data.class_var]) ** 2
+
+    return math.sqrt(err / n)
+
+
+def list_rmse(pairs):
+
+    err = 0
+    for pair in pairs:
+        err += (pair[1] - pair[0]) ** 2
+
+    return math.sqrt(err / len(pairs))
+
+
+def evaluate_dataset_mae(node, df_to_eval):
+
+    err = 0
+    n = df_to_eval.shape[0]
+    for _, row in df_to_eval.iterrows():
+        pred_val = evaluate_value_mean(node, row)
+        err += pred_val - row[node.data.class_var]
+
+    return err / n
+
+
+def list_mae(pairs):
+
+    err = 0
+    for pair in pairs:
+        err += pair[1] - pair[0]
+
+    return err / len(pairs)
+
+
+def evaluate_dataset_cc(node, df_to_eval):
+
+    sum_x_sqr = 0
+    sum_y_sqr = 0
+    sum_x = 0
+    sum_y = 0
+    sum_x_y = 0
+    n = df_to_eval.shape[0]
+    for _, row in df_to_eval.iterrows():
+        sum_x_sqr += row[node.data.class_var] ** 2
+        sum_y_sqr += evaluate_value_mean(node, row) ** 2
+        sum_x += row[node.data.class_var]
+        sum_y += evaluate_value_mean(node, row)
+        sum_x_y += row[node.data.class_var] * evaluate_value_mean(node, row)
+
+    return (sum_x_y - (sum_x * sum_y)/n) / math.sqrt((sum_x_sqr - (sum_x ** 2) / n) * (sum_y_sqr - (sum_y ** 2) / n))
+
+
+def list_cc(pairs):
+
+    sum_x_sqr = 0
+    sum_y_sqr = 0
+    sum_x = 0
+    sum_y = 0
+    sum_x_y = 0
+    n = len(pairs)
+
+    for pair in pairs:
+        sum_x_sqr += pair[0] ** 2
+        sum_y_sqr += pair[1] ** 2
+        sum_x += pair[0]
+        sum_y += pair[1]
+        sum_x_y += pair[0] * pair[1]
+
+    return (sum_x_y - (sum_x * sum_y)/n) / math.sqrt((sum_x_sqr - (sum_x ** 2) / n) * (sum_y_sqr - (sum_y ** 2) / n))
+
+
+def evaluate_dataset_raw(results_list, node, df_to_eval):
+    # This function appends to list (x, y) tuples
+    # where x is the raw value and y is the tree result
+
+    for _, row in df_to_eval.iterrows():
+        results_list.append((row[node.data.class_var], evaluate_value_mean(node, row)))
+
+    return results_list
+
+
+"""*************************
+******Cross Validation******
+*************************"""
+
+import random
+
+def cxval_k_folds_split(df, k_folds):
+
+    dataframes = []
+    group_size = int(round(df.shape[0]*(1.0/k_folds)))
+
+    for i in range(k_folds-1):
+        rows = random.sample(df.index, group_size)
+        dataframes.append(df.ix[rows])
+        df = df.drop(rows)
+
+    dataframes.append(df)
+
+    return dataframes
+
+
+def cxval_select_fold(i_fold, df_folds):
+    df_folds_copy = copy.deepcopy(df_folds)
+
+    if 0 <= i_fold < len(df_folds):
+
+        test_df = df_folds_copy[i_fold]
+        del df_folds_copy[i_fold]
+        train_df = pd.concat(df_folds_copy)
+
+        return train_df, test_df
+
+    else:
+        raise Exception('Group not in range!')
+
+
+def cxval_test(df, class_var, var_types, bin_size, k_folds):
+
+    df_folds = cxval_k_folds_split(df, k_folds)
+    results = []
+
+    for i in range(k_folds):
+        print("Cross Validation: {}".format(i+1))
+        train_df, test_df = cxval_select_fold(i, df_folds)
+        train_data = Data(train_df, class_var, var_types)
+        tree = tree_grower(train_data, bin_size)
+
+        print("Cross Correlation: {}".format(evaluate_dataset_cc(tree, test_df)))
+        print("Root Mean Square Error: {}".format(evaluate_dataset_rmse(tree, test_df)))
+        print("Mean Absolute Error: {}".format(evaluate_dataset_mae(tree, test_df)))
+
+
+def cxval_test2(df, class_var, var_types, bin_size, k_folds):
+
+    df_folds = cxval_k_folds_split(df, k_folds)
+    results = []
+
+    for i in range(k_folds):
+        train_df, test_df = cxval_select_fold(i, df_folds)
+        train_data = Data(train_df, class_var, var_types)
+        tree = tree_grower(train_data, bin_size)
+
+        evaluate_dataset_raw(results, tree, test_df)
+
+
+    print("Cross Correlation: {}".format(list_cc(results)))
+    print("Root Mean Square Error: {}".format(list_rmse(results)))
+    print("Mean Absolute Error: {}".format(list_mae(results)))
 
 
 if __name__ == "__main__":
@@ -244,6 +396,7 @@ if __name__ == "__main__":
         var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
 
         var_types_list = [var_types_linear, var_types_circular]
+        var_types_list = [var_types_linear, var_types_circular]
 
         bins = [2000, 1000, 500, 200, 100]
         for bin_size in bins:
@@ -273,15 +426,23 @@ if __name__ == "__main__":
                 df2['gfs_wind_spd'] = df2['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
 
                 class_var = 'metar_wind_spd'
+                print var_types
+                cxval_test2(df, class_var, var_types, bin_size, 10)
 
-                print("Full Columns")
+                """
+                #print("Full Columns")
                 data = Data(df, class_var, var_types)
                 new_tree = tree_grower(data, bin_size)
                 print var_types
-                print evaluate_dataset(new_tree, df)
+                print evaluate_dataset_cc(new_tree, df)
+                print evaluate_dataset_rmse(new_tree, df)
+                print evaluate_dataset_mae(new_tree, df)
+                """
 
+                """
                 print("Reduced Columns")
                 data = Data(df2, class_var, var_types)
                 new_tree = tree_grower(data, bin_size)
                 print var_types
                 print evaluate_dataset(new_tree, df2)
+                """
