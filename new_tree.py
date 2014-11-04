@@ -351,10 +351,27 @@ def cxval_test2(df, class_var, var_types, bin_size, k_folds):
     print("Mean Absolute Error: {}".format(list_mae(results)))
 
 
+def cxval_test3(df_folds, class_var, var_types, bin_size):
+
+    results = []
+
+    for i_fold, _ in enumerate(df_folds):
+        train_df, test_df = cxval_select_fold(i_fold, df_folds)
+        train_data = Data(train_df, class_var, var_types)
+        tree = tree_grower(train_data, bin_size)
+
+        evaluate_dataset_raw(results, tree, test_df)
+
+    return list_cc(results), list_rmse(results)
+
+
+
 if __name__ == "__main__":
 
     from datetime import datetime
     import calendar
+    import csv
+    import collections
 
     def time_to_angle(a_time):
         #return 360.0*(a_time.hour*3600+a_time.minute*60+a_time.second)/86400.0
@@ -392,57 +409,63 @@ if __name__ == "__main__":
     for airport in airports:
         print airport
 
-        var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
-        var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
+        df = pd.read_csv("./web/static/data/" + airport + ".csv")
+        df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir'], axis=1, inplace=True)
 
-        var_types_list = [var_types_linear, var_types_circular]
-        var_types_list = [var_types_linear, var_types_circular]
+        df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
+        df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
+        df['gfs_rh'] = df['gfs_rh'].apply(lambda x: round(x))
+        df['gfs_temp'] = df['gfs_temp'].apply(lambda x: round(x))
+        df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
 
-        bins = [2000, 1000, 500, 200, 100]
-        for bin_size in bins:
-            print bin_size
+        df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
+        df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
 
-            for var_types in var_types_list:
+        df2 = pd.read_csv("./web/static/data/" + airport + ".csv")
+        df2.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'date', u'time'], axis=1, inplace=True)
 
-                df = pd.read_csv("./web/static/data/" + airport + ".csv")
-                df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir'], axis=1, inplace=True)
+        df2['gfs_wind_dir'] = df2['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
+        df2['gfs_press'] = df2['gfs_press'].apply(lambda x: round(x))
+        df2['gfs_rh'] = df2['gfs_rh'].apply(lambda x: round(x))
+        df2['gfs_temp'] = df2['gfs_temp'].apply(lambda x: round(x))
+        df2['gfs_wind_spd'] = df2['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
 
-                df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
-                df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
-                df['gfs_rh'] = df['gfs_rh'].apply(lambda x: round(x))
-                df['gfs_temp'] = df['gfs_temp'].apply(lambda x: round(x))
-                df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
+        class_var = 'metar_wind_spd'
 
-                df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
-                df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
+        result_list = []
+        for _ in range(10):
 
-                df2 = pd.read_csv("./web/static/data/" + airport + ".csv")
-                df2.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'date', u'time'], axis=1, inplace=True)
+            result = collections.OrderedDict()
+            df_folds = cxval_k_folds_split(df, 10)
 
-                df2['gfs_wind_dir'] = df2['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
-                df2['gfs_press'] = df2['gfs_press'].apply(lambda x: round(x))
-                df2['gfs_rh'] = df2['gfs_rh'].apply(lambda x: round(x))
-                df2['gfs_temp'] = df2['gfs_temp'].apply(lambda x: round(x))
-                df2['gfs_wind_spd'] = df2['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
+            bins = [2000, 1000, 500, 200, 100]
+            for bin_size in bins:
+                print bin_size
 
-                class_var = 'metar_wind_spd'
-                print var_types
-                cxval_test2(df, class_var, var_types, bin_size, 10)
+                var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
+                var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
 
-                """
-                #print("Full Columns")
-                data = Data(df, class_var, var_types)
-                new_tree = tree_grower(data, bin_size)
-                print var_types
-                print evaluate_dataset_cc(new_tree, df)
-                print evaluate_dataset_rmse(new_tree, df)
-                print evaluate_dataset_mae(new_tree, df)
-                """
+                var_types_list = [var_types_linear, var_types_circular]
 
-                """
-                print("Reduced Columns")
-                data = Data(df2, class_var, var_types)
-                new_tree = tree_grower(data, bin_size)
-                print var_types
-                print evaluate_dataset(new_tree, df2)
-                """
+                for i, var_types in enumerate(var_types_list):
+                    print var_types
+                    cc_value, rmse_value = cxval_test3(df_folds, class_var, var_types, bin_size)
+
+                    if i == 0:
+                        result["lin_" + str(bin_size) + "_cc"] = cc_value
+                        result["lin_" + str(bin_size) + "_rmse"] = rmse_value
+
+                    elif i == 1:
+                        result["cir_" + str(bin_size) + "_cc"] = cc_value
+                        result["cir_" + str(bin_size) + "_rmse"] = rmse_value
+
+                    else:
+                        raise NotImplementedError("What's going on!")
+
+            result_list.append(result)
+
+
+        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/' + airport + '.csv', 'wb') as f:
+            w = csv.DictWriter(f, result_list[0].keys())
+            w.writeheader()
+            w.writerows(result_list)
