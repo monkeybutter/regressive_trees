@@ -326,7 +326,7 @@ def cxval_test(df, class_var, var_types, bin_size, k_folds):
         print("Cross Validation: {}".format(i+1))
         train_df, test_df = cxval_select_fold(i, df_folds)
         train_data = Data(train_df, class_var, var_types)
-        tree = tree_grower(train_data, bin_size)
+        tree = tree_grower(test_data, bin_size)
 
         print("Cross Correlation: {}".format(evaluate_dataset_cc(tree, test_df)))
         print("Root Mean Square Error: {}".format(evaluate_dataset_rmse(tree, test_df)))
@@ -360,7 +360,7 @@ def cxval_test3(df_folds, class_var, var_types, bin_size):
         train_data = Data(train_df, class_var, var_types)
         tree = tree_grower(train_data, bin_size)
 
-        evaluate_dataset_raw(results, tree, train_df)
+        evaluate_dataset_raw(results, tree, test_df)
 
     return list_cc(results), list_rmse(results)
 
@@ -394,7 +394,7 @@ if __name__ == "__main__":
         print airport
 
         df = pd.read_csv("./web/static/data/" + airport + ".csv")
-        df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir'], axis=1, inplace=True)
+        df.drop([u'metar_press', u'metar_rh', u'metar_wind_spd', u'metar_wind_dir'], axis=1, inplace=True)
 
         df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
         df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
@@ -405,7 +405,7 @@ if __name__ == "__main__":
         df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
         df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
 
-        class_var = 'metar_wind_spd'
+        class_var = 'metar_temp'
 
         result_list = []
         for _ in range(5):
@@ -440,7 +440,7 @@ if __name__ == "__main__":
             result_list.append(result)
 
 
-        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/' + airport + '.csv', 'wb') as f:
+        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/temp_' + airport + '.csv', 'wb') as f:
             w = csv.DictWriter(f, result_list[0].keys())
             w.writeheader()
             w.writerows(result_list)
