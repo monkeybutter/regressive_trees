@@ -3,6 +3,7 @@ import numpy as np
 import copy
 import pandas as pd
 import math
+from multiprocessing import Process, Manager
 
 
 class Data(object):
@@ -21,7 +22,7 @@ class Data(object):
                 self.var_limits[var_name] = (float("-inf"), float("inf"))
 
 
-def circular_criteria(master_data, split_var):
+def circular_criteria(queue, master_data, split_var):
     data = copy.deepcopy(master_data)
 
     if data.var_limits[split_var] == (float("-inf"), float("inf")):
@@ -56,7 +57,8 @@ def circular_criteria(master_data, split_var):
         right_data.var_limits[split_var] = (dfs[min_index[0]][split_var].iloc[index_lists[min_index[0]][min_index[1] + 1]],
                                             dfs[min_index[0]][split_var].iloc[0])
 
-        return score, left_data, right_data
+        queue.put((score, left_data, right_data))
+        return True
 
     else:
 
@@ -64,21 +66,20 @@ def circular_criteria(master_data, split_var):
         # If dataset crosses origin, it has to be reordered
         if data.var_limits[split_var][1] < data.var_limits[split_var][0]:
             data.df = copy.deepcopy(
-                data.df[(data.df[split_var] >= data.var_limits[split_var][0]) & (data.df[split_var] <= 360)]).append(
-                copy.deepcopy(
-                    data.df[(data.df[split_var] >= 0) & (data.df[split_var] <= data.var_limits[split_var][1])]))
+                data.df[(data.df[split_var] >= data.var_limits[split_var][0]) & (data.df[split_var] <= 360)])\
+                .append(copy.deepcopy(data.df[(data.df[split_var] >= 0) & (data.df[split_var] <= data.var_limits[split_var][1])]))
 
-        return splitter(data, split_var)
+        return splitter(queue, data, split_var)
 
 
-def linear_criteria(master_data, split_var):
+def linear_criteria(queue, master_data, split_var):
     data = copy.deepcopy(master_data)
     data.df = data.df.sort([split_var])
 
-    return splitter(data, split_var)
+    return splitter(queue, data, split_var)
 
 
-def splitter(data, split_var):
+def splitter(queue, data, split_var):
     values, indices = np.unique(data.df[split_var], return_index=True)
 
      # In case indices are not ordered we need to sort both to leave 0 index at position 0
@@ -100,7 +101,8 @@ def splitter(data, split_var):
     left_data.var_limits[split_var] = (data.var_limits[split_var][0], values[np.argmin(scores) + 1])
     right_data.var_limits[split_var] = (values[np.argmin(scores) + 1], data.var_limits[split_var][1])
 
-    return np.min(scores), left_data, right_data
+    queue.put((np.min(scores), left_data, right_data))
+    return True
 
 
 class Node(object):
@@ -119,27 +121,46 @@ class Node(object):
         best_right = None
         best_left = None
         best_score = float("inf")
+
+        processes = []
+        manager = Manager()
+        queue = manager.Queue()
+
         for idx, split_var in enumerate(self.data.df.columns):
 
             if split_var != self.data.class_var:
 
                 if self.data.var_types[idx] == "circular":
-                    score, left, right = circular_criteria(self.data, split_var)
+                    #score, left, right = circular_criteria(self.data, split_var)
+                    p = Process(target=circular_criteria, args=(queue, self.data, split_var))
+                    processes.append(p)
+                    p.start()
+
 
                 elif self.data.var_types[idx] == "linear":
-                    score, left, right = linear_criteria(self.data, split_var)
+                    #score, left, right = linear_criteria(self.data, split_var)
+                    p = Process(target=linear_criteria, args=(queue, self.data, split_var))
+                    processes.append(p)
+                    p.start()
 
                 else:
                     raise NotImplementedError('Other types need to be implemented!')
 
-                if best_score > score:
-                    best_score = score
-                    self.split_var = split_var
+        # Wait for all processes to finish
+        for p in processes:
+            p.join()
 
-                    best_left = left
-                    best_right = right
-                else:
-                    pass
+        for _ in processes:
+            score, left, right = queue.get()
+
+            if best_score > score:
+                best_score = score
+                self.split_var = split_var
+
+                best_left = left
+                best_right = right
+            else:
+                pass
 
         # print best_score
         self.left_child = Node(best_left)
@@ -157,19 +178,6 @@ def tree_grower(tree_data, min_leaf):
         node.right_child = tree_grower(node.right_child.data, min_leaf)
 
     return node
-
-
-def tree_walk_count_var(tree, var_name):
-
-    if tree.split_var is not None:
-
-        if tree.split_var == var_name:
-            return 1 + tree_walk_count_var(tree.left_child, var_name) + tree_walk_count_var(tree.right_child, var_name)
-        else:
-            return tree_walk_count_var(tree.left_child, var_name) + tree_walk_count_var(tree.right_child, var_name)
-
-    else:
-        return 0
 
 
 """*************************
@@ -376,9 +384,6 @@ def cxval_test3(df_folds, class_var, var_types, bin_size):
 
         evaluate_dataset_raw(results_test, tree, test_df)
         evaluate_dataset_raw(results_train, tree, train_df)
-        print("gfs_wind_dir: {} times".format(tree_walk_count_var(tree, 'gfs_wind_dir')))
-        print("date: {} times".format(tree_walk_count_var(tree, 'date')))
-        print("time: {} times".format(tree_walk_count_var(tree, 'time')))
 
     return list_cc(results_test), list_rmse(results_test), list_cc(results_train), list_rmse(results_train)
 
@@ -461,7 +466,7 @@ if __name__ == "__main__":
             result_list.append(result)
 
 
-        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/wind_spd_' + airport + '.csv', 'wb') as f:
+        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/wind_spd_' + airport + '_par.csv', 'wb') as f:
             w = csv.DictWriter(f, result_list[0].keys())
             w.writeheader()
             w.writerows(result_list)
