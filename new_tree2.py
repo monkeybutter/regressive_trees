@@ -353,17 +353,18 @@ def cxval_test2(df, class_var, var_types, bin_size, k_folds):
 
 def cxval_test3(df_folds, class_var, var_types, bin_size):
 
-    results = []
+    results_test = []
+    results_train = []
 
     for i_fold, _ in enumerate(df_folds):
         train_df, test_df = cxval_select_fold(i_fold, df_folds)
         train_data = Data(train_df, class_var, var_types)
         tree = tree_grower(train_data, bin_size)
 
-        evaluate_dataset_raw(results, tree, test_df)
+        evaluate_dataset_raw(results_test, tree, test_df)
+        evaluate_dataset_raw(results_train, tree, train_df)
 
-    return list_cc(results), list_rmse(results)
-
+    return list_cc(results_test), list_rmse(results_test), list_cc(results_train), list_rmse(results_train)
 
 
 if __name__ == "__main__":
@@ -394,7 +395,7 @@ if __name__ == "__main__":
         print airport
 
         df = pd.read_csv("./web/static/data/" + airport + ".csv")
-        df.drop([u'metar_press', u'metar_rh', u'metar_wind_spd', u'metar_wind_dir'], axis=1, inplace=True)
+        df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir'], axis=1, inplace=True)
 
         df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
         df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
@@ -405,7 +406,7 @@ if __name__ == "__main__":
         df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
         df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
 
-        class_var = 'metar_temp'
+        class_var = 'metar_wind_spd'
 
         result_list = []
         for _ in range(5):
@@ -424,15 +425,19 @@ if __name__ == "__main__":
 
                 for i, var_types in enumerate(var_types_list):
                     print var_types
-                    cc_value, rmse_value = cxval_test3(df_folds, class_var, var_types, bin_size)
+                    cc_value_test, rmse_value_test, cc_value_train, rmse_value_train = cxval_test3(df_folds, class_var, var_types, bin_size)
 
                     if i == 0:
-                        result["lin_" + str(bin_size) + "_cc"] = cc_value
-                        result["lin_" + str(bin_size) + "_rmse"] = rmse_value
+                        result["lin_" + str(bin_size) + "_cc_test"] = cc_value_test
+                        result["lin_" + str(bin_size) + "_rmse_test"] = rmse_value_test
+                        result["lin_" + str(bin_size) + "_cc_train"] = cc_value_train
+                        result["lin_" + str(bin_size) + "_rmse_train"] = rmse_value_train
 
                     elif i == 1:
-                        result["cir_" + str(bin_size) + "_cc"] = cc_value
-                        result["cir_" + str(bin_size) + "_rmse"] = rmse_value
+                        result["cir_" + str(bin_size) + "_cc_test"] = cc_value_test
+                        result["cir_" + str(bin_size) + "_rmse_test"] = rmse_value_test
+                        result["cir_" + str(bin_size) + "_cc_train"] = cc_value_train
+                        result["cir_" + str(bin_size) + "_rmse_train"] = rmse_value_train
 
                     else:
                         raise NotImplementedError("What's going on!")
@@ -440,7 +445,7 @@ if __name__ == "__main__":
             result_list.append(result)
 
 
-        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/temp_' + airport + '.csv', 'wb') as f:
+        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/wind_spd_' + airport + '.csv', 'wb') as f:
             w = csv.DictWriter(f, result_list[0].keys())
             w.writeheader()
             w.writerows(result_list)
