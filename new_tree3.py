@@ -110,6 +110,7 @@ class Node(object):
     def __init__(self, node_data):
 
         self.split_var = None
+        self.score = None
         self.data = node_data
         self.left_child = None
         self.right_child = None
@@ -142,6 +143,7 @@ class Node(object):
                     pass
 
         # print best_score
+        self.score = best_score
         self.left_child = Node(best_left)
         self.right_child = Node(best_right)
 
@@ -162,12 +164,12 @@ def tree_grower(tree_data, min_leaf):
 def tree_walk_printer(tree, level=0):
 
     if tree.split_var is not None:
-        print level*"  " + tree.split_var
+        print level*"   " + "|-" + tree.split_var + " " + str(tree.score)
         tree_walk_printer(tree.left_child, level+1)
         tree_walk_printer(tree.right_child, level+1)
 
     else:
-        print level*"  " + "LEAF!"
+        print level*"   " + "|-LEAF!"
 
 
 def tree_walk_count_var(tree, var_name):
@@ -435,44 +437,23 @@ if __name__ == "__main__":
 
         class_var = 'metar_wind_spd'
 
-        result_list = []
-        for _ in range(5):
+        #bins = [2000, 1000, 500, 200, 100, 50]
+        bins = [1000]
 
-            result = collections.OrderedDict()
-            df_folds = cxval_k_folds_split(df, 5)
+        for bin_size in bins:
+            print bin_size
 
-            bins = [2000, 1000, 500, 200, 100, 50]
-            for bin_size in bins:
-                print bin_size
+            var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
+            var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
 
-                var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
-                var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
+            var_types_list = [var_types_linear, var_types_circular]
 
-                var_types_list = [var_types_linear, var_types_circular]
+            for var_types in var_types_list:
+                print var_types
 
-                for i, var_types in enumerate(var_types_list):
-                    print var_types
-                    cc_value_test, rmse_value_test, cc_value_train, rmse_value_train = cxval_test3(df_folds, class_var, var_types, bin_size)
+                train_data = Data(df, class_var, var_types)
+                tree = tree_grower(train_data, bin_size)
 
-                    if i == 0:
-                        result["lin_" + str(bin_size) + "_cc_test"] = cc_value_test
-                        result["lin_" + str(bin_size) + "_rmse_test"] = rmse_value_test
-                        result["lin_" + str(bin_size) + "_cc_train"] = cc_value_train
-                        result["lin_" + str(bin_size) + "_rmse_train"] = rmse_value_train
-
-                    elif i == 1:
-                        result["cir_" + str(bin_size) + "_cc_test"] = cc_value_test
-                        result["cir_" + str(bin_size) + "_rmse_test"] = rmse_value_test
-                        result["cir_" + str(bin_size) + "_cc_train"] = cc_value_train
-                        result["cir_" + str(bin_size) + "_rmse_train"] = rmse_value_train
-
-                    else:
-                        raise NotImplementedError("What's going on!")
-
-            result_list.append(result)
+                tree_walk_printer(tree, 0)
 
 
-        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/wind_spd_' + airport + '.csv', 'wb') as f:
-            w = csv.DictWriter(f, result_list[0].keys())
-            w.writeheader()
-            w.writerows(result_list)
