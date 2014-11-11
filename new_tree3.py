@@ -438,7 +438,7 @@ if __name__ == "__main__":
         class_var = 'metar_wind_spd'
 
         #bins = [2000, 1000, 500, 200, 100, 50]
-        bins = [1000]
+        bins = [100]
 
         for bin_size in bins:
             print bin_size
@@ -454,6 +454,9 @@ if __name__ == "__main__":
                 train_data = Data(df, class_var, var_types)
                 tree = tree_grower(train_data, bin_size)
 
-                tree_walk_printer(tree, 0)
+                #tree_walk_printer(tree, 0)
+                print("GFS Wind Dir: {} times".format(tree_walk_count_var(tree, 'gfs_wind_dir')))
+                print("Date: {} times".format(tree_walk_count_var(tree, 'date')))
+                print("Time: {} times".format(tree_walk_count_var(tree, 'time')))
 
 

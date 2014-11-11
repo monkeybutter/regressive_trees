@@ -435,10 +435,6 @@ if __name__ == "__main__":
 
         class_var = 'metar_wind_spd'
 
-        import sys
-        print df.columns
-        sys.exit("Error Message")
-
         result_list = []
         for _ in range(2):
 
@@ -478,7 +474,7 @@ if __name__ == "__main__":
             result_list.append(result)
 
 
-        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/wind_spd_' + airport + '_date.csv', 'wb') as f:
+        with open('/home/roz016/Dropbox/Data for Tree/Results/new_tree_cx10_lin_vs_cir/wind_spd_' + airport + '_winddir.csv', 'wb') as f:
             w = csv.DictWriter(f, result_list[0].keys())
             w.writeheader()
             w.writerows(result_list)

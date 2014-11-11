@@ -422,22 +422,19 @@ if __name__ == "__main__":
         print airport
 
         df = pd.read_csv("./web/static/data/" + airport + ".csv")
-        df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'date', u'time'], axis=1, inplace=True)
+        df.drop([u'metar_press', u'metar_rh', u'metar_temp', u'metar_wind_dir', u'time'], axis=1, inplace=True)
+        df.drop([u'gfs_wind_dir'], axis=1, inplace=True)
 
-        df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
+        #df['gfs_wind_dir'] = df['gfs_wind_dir'].apply(lambda x: round(x / 10) * 10)
         df['gfs_press'] = df['gfs_press'].apply(lambda x: round(x))
         df['gfs_rh'] = df['gfs_rh'].apply(lambda x: round(x))
         df['gfs_temp'] = df['gfs_temp'].apply(lambda x: round(x))
         df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
 
-        #df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
+        df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
         #df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
 
         class_var = 'metar_wind_spd'
-
-        import sys
-        print df.columns
-        sys.exit("Error Message")
 
         result_list = []
         for _ in range(2):
@@ -452,7 +449,7 @@ if __name__ == "__main__":
                 #var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
                 #var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
                 var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear']
-                var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear']
+                var_types_circular = ['linear', 'linear', 'linear', 'linear', 'linear', 'circular']
 
                 var_types_list = [var_types_linear, var_types_circular]
 
