@@ -433,6 +433,9 @@ if __name__ == "__main__":
             #return 360.0*(a_date.timetuple().tm_yday-1)/365.0
             return 10*int(a_date.timetuple().tm_yday/10.0)
 
+    def most_common(lst):
+        return max(set(lst), key=lst.count)
+
     var_types_linear = ['linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear', 'linear']
     var_types_circular = ['linear', 'linear', 'linear', 'linear', 'circular', 'linear', 'circular', 'circular']
 
@@ -461,6 +464,8 @@ if __name__ == "__main__":
 
         results_test = []
 
+        methods = []
+
         for i_fold, _ in enumerate(df_folds):
             print i_fold
 
@@ -485,11 +490,19 @@ if __name__ == "__main__":
                         opt_method = type_idx
                         best_rmse = rmse_value_test
 
-            print("Use {} bin size and {} method".format(opt_bin, opt_method))
+            methods.append((opt_method, opt_bin))
 
-            train_data = Data(train_df, class_var, var_types_list[opt_method])
-            tree = tree_grower(train_data, opt_bin)
+            print methods
 
-            evaluate_dataset_raw(results_test, tree, test_df)
+        opt_method, opt_bin = most_common(methods)
+        print("Method {} Bin {}".format(opt_method, opt_bin))
 
-        print("RMSE {}".format(list_rmse(results_test)))
+        print("What's next?")
+
+            #train_data = Data(train_df, class_var, var_types_list[opt_method])
+            #tree = tree_grower(train_data, opt_bin)
+
+            #evaluate_dataset_raw(results_test, tree, test_df)
+
+
+        #print("RMSE {}".format(list_rmse(results_test)))
