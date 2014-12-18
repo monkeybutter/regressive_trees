@@ -467,7 +467,7 @@ if __name__ == "__main__":
         methods = []
 
         for i_fold, _ in enumerate(df_folds):
-            print i_fold
+            print("Outer Loop {} fold".format(i_fold))
 
             inner_df_folds = copy.deepcopy(df_folds)
 
@@ -475,20 +475,32 @@ if __name__ == "__main__":
             del inner_df_folds[i_fold]
             train_df = pd.concat(inner_df_folds)
 
-            bins = [2000, 1000, 500, 200, 100, 50]
+            for j_fold, _ in enumerate(inner_df_folds):
+                print("Inner Loop {} fold".format(j_fold))
 
-            opt_bin = None
-            opt_method = None
-            best_rmse = float('inf')
+                inner_df_folds_copy = copy.deepcopy(inner_df_folds)
 
-            for bin_size in bins:
+                inner_test_df = inner_df_folds_copy[j_fold]
+                del inner_df_folds_copy[j_fold]
+                train_df = pd.concat(inner_df_folds_copy)
 
-                for type_idx, var_types in enumerate(var_types_list):
-                    rmse_value_test = cxval_test4(inner_df_folds, class_var, var_types, bin_size)
-                    if rmse_value_test < best_rmse:
-                        opt_bin = bin_size
-                        opt_method = type_idx
-                        best_rmse = rmse_value_test
+                bins = [2000, 1000, 500, 200, 100, 50]
+
+                opt_bin = None
+                opt_method = None
+                best_rmse = float('inf')
+
+                for bin_size in bins:
+                    for type_idx, var_types in enumerate(var_types_list):
+                        print("Testing {} method and {} size".format(bin_size, type_idx))
+
+
+        """
+                        rmse_value_test = cxval_test4(inner_df_folds, class_var, var_types, bin_size)
+                        if rmse_value_test < best_rmse:
+                            opt_bin = bin_size
+                            opt_method = type_idx
+                            best_rmse = rmse_value_test
 
             methods.append((opt_method, opt_bin))
 
@@ -503,6 +515,7 @@ if __name__ == "__main__":
             #tree = tree_grower(train_data, opt_bin)
 
             #evaluate_dataset_raw(results_test, tree, test_df)
+        """
 
 
         #print("RMSE {}".format(list_rmse(results_test)))
