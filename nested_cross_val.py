@@ -442,6 +442,7 @@ if __name__ == "__main__":
     var_types_list = [var_types_linear, var_types_circular]
 
     airports = ['eddt', 'lebl', 'lfpg', 'limc', 'yssy', 'egll', 'zbaa']
+    airports = ['eddt']
 
     for airport in airports:
         print airport
@@ -454,7 +455,6 @@ if __name__ == "__main__":
         df['gfs_rh'] = df['gfs_rh'].apply(lambda x: round(x))
         df['gfs_temp'] = df['gfs_temp'].apply(lambda x: round(x))
         df['gfs_wind_spd'] = df['gfs_wind_spd'].apply(lambda x: 0.5 * round(x / 0.5))
-
         df['date'] = df['date'].apply(lambda x: date_to_angle(datetime.strptime(x, "%Y-%m-%d").date()))
         df['time'] = df['time'].apply(lambda x: time_to_angle(datetime.strptime(x, "%H:%M").time()))
 
@@ -463,8 +463,6 @@ if __name__ == "__main__":
         df_folds = cxval_k_folds_split(df, 5)
 
         results_test = []
-
-        methods = []
 
         for i_fold, _ in enumerate(df_folds):
             print("Outer Loop {} fold".format(i_fold))
@@ -475,24 +473,43 @@ if __name__ == "__main__":
             del inner_df_folds[i_fold]
             train_df = pd.concat(inner_df_folds)
 
-            for j_fold, _ in enumerate(inner_df_folds):
-                print("Inner Loop {} fold".format(j_fold))
+            bins = [2000, 1000, 500, 200, 100, 50]
 
-                inner_df_folds_copy = copy.deepcopy(inner_df_folds)
+            opt_bin = None
+            opt_method = None
+            best_rmse = float('inf')
 
-                inner_test_df = inner_df_folds_copy[j_fold]
-                del inner_df_folds_copy[j_fold]
-                train_df = pd.concat(inner_df_folds_copy)
+            for bin_size in bins:
+                for type_idx, var_types in enumerate(var_types_list):
 
-                bins = [2000, 1000, 500, 200, 100, 50]
+                    print("Testing {} method and {} size".format(type_idx, bin_size))
 
-                opt_bin = None
-                opt_method = None
-                best_rmse = float('inf')
+                    inner_results_test = []
 
-                for bin_size in bins:
-                    for type_idx, var_types in enumerate(var_types_list):
-                        print("Testing {} method and {} size".format(bin_size, type_idx))
+                    for j_fold, _ in enumerate(inner_df_folds):
+                        inner_train_df, inner_test_df = cxval_select_fold(j_fold, inner_df_folds)
+                        inner_train_data = Data(inner_train_df, class_var, var_types)
+                        inner_tree = tree_grower(inner_train_data, bin_size)
+
+                        evaluate_dataset_raw(inner_results_test, inner_tree, inner_test_df)
+
+                    local_rmse = list_rmse(inner_results_test)
+
+                    if local_rmse < best_rmse:
+                        best_rmse = local_rmse
+                        opt_bin = bin_size
+                        opt_method = type_idx
+                    print("RMSE inner {}".format(list_rmse(inner_results_test)))
+            print("Opt method {} {}".format(opt_method, opt_bin))
+
+            train_data = Data(train_df, class_var, var_types_list[opt_method])
+            tree = tree_grower(train_data, opt_bin)
+            evaluate_dataset_raw(results_test, tree, test_df)
+
+            print("RMSE outer {}".format(list_rmse(results_test)))
+
+
+
 
 
         """
